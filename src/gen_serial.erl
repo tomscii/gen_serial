@@ -404,7 +404,7 @@ open(Device, Opts) when is_atom(Device) ->
 	 end;
 open(Device, Opts) ->
 	case cfg(Opts, cfg_defaults()) of
-	Cfg when record(Cfg, serial_cfg) ->	startup_port(Device, Cfg);
+	Cfg when is_record(Cfg, serial_cfg) ->	startup_port(Device, Cfg);
 	Other ->							Other
 	end.
 
