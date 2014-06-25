@@ -425,7 +425,7 @@ open(Device, Opts) ->
 setopts(PortRef, Opts=[{active, _}]) ->
 	Cfg = cfg(Opts, cfg_defaults()),
 	Active = Cfg#serial_cfg.initially_active,
-	true = port_command(Port, <<?PACKET_ACTIVE:8, Active:8>>),
+	true = port_command(PortRef, <<?PACKET_ACTIVE:8, Active:8>>),
 	ok.
 
 
