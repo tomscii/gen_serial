@@ -1,0 +1,16 @@
+Windows Native Code:
+
+To build the Windows native code, load the Visual C++ project file
+in "win32/win32serial.vcproj".  Use Build Solution to compile the
+project.  Two configurations are supported, "Release" and "Debug".
+
+When the build is complete, a post build trigger should copy the
+executeable "serial_esock.exe" from win32/Debug or win32/Release
+to ../priv/bin, the directory where the gen_serial application will
+expect to find the executable file.
+
+
+UNIX Native Code:
+
+Not ready at this time.  It cannot be built.  Look in 0.2 for the
+UNIX version.

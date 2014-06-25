@@ -1,0 +1,7 @@
+{name, "gen_serial"}.
+{vsn, {0,1}}.
+{summary, "Generic Serial Driver for UNIX and Windows."}.
+{author, "Shawn Pearce", "spearce+erlang@spearce.org", ""}.
+{keywords, ["serial", "gen_serial"]}.
+{needs, []}.
+{abstract,"This is a port driver program for communication between Erlang and standard RS-232 serial ports."}.

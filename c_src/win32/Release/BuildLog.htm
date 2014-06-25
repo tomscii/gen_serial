@@ -1,0 +1,62 @@
+<html>
+<head>
+<META HTTP-EQUIV="Content-Type" content="text/html; charset=Windows-1252">
+</head>
+<body>
+<pre>
+<table width=100% bgcolor=#CFCFE5><tr> <td> <font face=arial size=+3>
+Build Log
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>
+<h3>------- Build started: Project: win32serial, Configuration: Release|Win32 -------
+</h3>
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Command Lines
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>This edition of Visual C++ does not support the optimizing compiler.
+This edition of Visual C++ does not support the optimizing compiler.
+Creating temporary file "r:\Trutino\gen_serial-0.1\c_src\win32\Release\RSP000001.rsp" with contents
+[
+/GA /I ".." /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "WIN32PIPE_THREADS" /D "_MBCS" /FD /ML /Zp1 /Fo"Release/" /Fd"Release/vc70.pdb" /W3 /c /Wp64 /Zi /TC
+".\win32serial_overlapped.c"
+".\win32pipe_threads.c"
+".\win32_main.c"
+"\Trutino\gen_serial-0.1\c_src\erlang_serial.c"
+]
+Creating command line "cl.exe @"r:\Trutino\gen_serial-0.1\c_src\win32\Release\RSP000001.rsp" /nologo"
+Creating temporary file "r:\Trutino\gen_serial-0.1\c_src\win32\Release\RSP000002.rsp" with contents
+[
+/OUT:"Release/serial_esock.exe" /VERSION:0.1 /INCREMENTAL:NO /NOLOGO /SUBSYSTEM:CONSOLE /LARGEADDRESSAWARE:NO /OPT:REF /OPT:ICF /MACHINE:X86 Ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib
+".\Release\erlang_serial.obj"
+".\Release\win32_main.obj"
+".\Release\win32pipe_threads.obj"
+".\Release\win32serial_overlapped.obj"
+]
+Creating command line "link.exe @"r:\Trutino\gen_serial-0.1\c_src\win32\Release\RSP000002.rsp""
+Creating temporary file "r:\Trutino\gen_serial-0.1\c_src\win32\Release\BAT000003.bat" with contents
+[
+@echo off
+copy /B /Y r:\Trutino\gen_serial-0.1\c_src\win32\Release\serial_esock.exe r:\Trutino\gen_serial-0.1\c_src\win32\..\..\priv\bin
+if errorlevel 1 goto VCReportError
+goto VCEnd
+:VCReportError
+echo Project : error PRJ0019: A tool returned an error code from "Copy serial_esock.exe to r:\Trutino\gen_serial-0.1\c_src\win32\..\..\priv\bin"
+exit 1
+:VCEnd
+]
+Creating command line ""r:\Trutino\gen_serial-0.1\c_src\win32\Release\BAT000003.bat""
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Output Window
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>Compiling...
+win32serial_overlapped.c
+win32pipe_threads.c
+win32_main.c
+erlang_serial.c
+Generating Code...
+Linking...
+Copy serial_esock.exe to r:\Trutino\gen_serial-0.1\c_src\win32\..\..\priv\bin
+        1 file(s) copied.
+</pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
+Results
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>
+Build log was saved at "file://r:\Trutino\gen_serial-0.1\c_src\win32\Release\BuildLog.htm"
+win32serial - 0 error(s), 0 warning(s)</pre></table><table   width=100% height=20 bgcolor=#CFCFE5><tr><td><font face=arial size=+2>
+</font></table></body></html>
