@@ -1,7 +1,7 @@
 SOURCES = ../erlang_serial.c $(wildcard *.c)
 HEADERS = ../erlang_serial.h $(wildcard *.h)
 OBJS = $(SOURCES:%.c=%.o)
-CFLAGS ?= -Wall -Wextra -O2 -g -ggdb
+CFLAGS = -Wall -Wextra -O2 -g -ggdb -D_DEBUG
 LIBS = 
 
 all: serial_esock
