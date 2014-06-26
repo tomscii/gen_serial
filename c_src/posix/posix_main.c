@@ -135,9 +135,6 @@ int serial_configure(struct serial_channel *_chan, struct serial_cfg *cfg)
 
 int serial_flush(struct serial_channel *_chan)
 {
-	struct serial_posix *chan = (struct serial_posix *)_chan;
-
-	/* TODO */
 	return 0;
 }
 
@@ -272,7 +269,6 @@ void pipe_close(struct pipe_channel *_chan)
 
 struct pollfd pipe_os_readable(struct pipe_channel *_chan)
 {
-	struct pipe_posix *chan = (struct pipe_posix *)_chan;
 	struct pollfd ret;
 	ret.fd = STDIN_FILENO;
 	ret.events = POLLIN;
@@ -281,7 +277,6 @@ struct pollfd pipe_os_readable(struct pipe_channel *_chan)
 
 struct pollfd pipe_os_writeable(struct pipe_channel *_chan)
 {
-	struct pipe_posix *chan = (struct pipe_posix *)_chan;
 	struct pollfd ret;
 	ret.fd = STDOUT_FILENO;
 	ret.events = POLLOUT;
@@ -307,7 +302,6 @@ static void main_loop(struct serial_port *port)
 {
 	int nfds;
 	struct pollfd pollfds[4];
-	int pres;
 
 #ifdef _DEBUG
 	char dbgmsg[256];
@@ -354,9 +348,15 @@ static void main_loop(struct serial_port *port)
 		/* Wait for any of the above events to become true.  Break out
 		 * as soon as one of them is in fact true.
 		 */
-		pres = poll(pollfds, nfds, -1);
+		if (poll(pollfds, nfds, -1) < 0) {
+			port->isDead = 1;
+		}
 
 		for (i = 0; i < nfds; i++) {
+			if (pollfds[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+				port->isDead = 1;
+			}
+
 			if ((pollfds[i].fd == STDIN_FILENO) && (pollfds[i].revents & POLLIN)) {
 				serial_port_ertsr(port);
 			} else if ((pollfds[i].fd == STDOUT_FILENO) && (pollfds[i].revents & POLLOUT)) {
