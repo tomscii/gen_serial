@@ -417,7 +417,7 @@ static void process_outgoing (struct serial_port* port)
 
 process_type:
 	avail = port->outgoingLen - port->outgoingSent;
-	if (0 == avail)
+	if ((0 == avail) && (port->outgoingPacketType == PACKET_NONE))
 	{
 		return;
 	}
@@ -456,14 +456,6 @@ DBG_LOG(fprintf(debug_log_file,
 			if (PACKET_NONE == port->outgoingPacketType)
 			{
 				port->outgoingPacketType = PACKET_DRAIN;
-			}
-
-			/* If the packet is empty, skip it completely and switch back to
-			 * type of none.
-			 */
-			if (0 == port->outgoingPacketLeft)
-			{
-				port->outgoingPacketType = PACKET_NONE;
 			}
 
 			/* Loop to process the newly discovered packet type.  We
