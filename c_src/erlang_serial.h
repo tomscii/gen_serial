@@ -1,6 +1,14 @@
 #ifndef _INC_erlang_serial_h
 #define _INC_erlang_serial_h
 
+/* translate error constants to POSIX values */
+#ifndef WIN32
+#include <errno.h>
+#define ERROR_SUCCESS      0
+#define ERROR_INVALID_DATA EINVAL
+#define ERROR_BAD_LENGTH   EBADMSG
+#endif
+
 #define SERIAL_PARITY_NONE	0
 #define SERIAL_PARITY_ODD	1
 #define SERIAL_PARITY_EVEN	2
