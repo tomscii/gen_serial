@@ -3,7 +3,10 @@ HEADERS = ../erlang_serial.h $(wildcard *.h)
 OBJS = $(SOURCES:%.c=%.o)
 CFLAGS = -Wall -O2 -g -ggdb
 
-all: serial_esock
+all: ../../priv/bin/serial_esock
+
+../../priv/bin/serial_esock: serial_esock
+	cp serial_esock ../../priv/bin/
 
 serial_esock: $(OBJS)
 	$(CC) -o $@ $^
@@ -12,6 +15,6 @@ serial_esock: $(OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -rf *~ $(OBJS) serial_esock
+	rm -rf *~ $(OBJS) serial_esock ../../priv/bin/serial_esock
 
 .PHONY: all clean

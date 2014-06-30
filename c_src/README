@@ -1,16 +1,42 @@
-Windows Native Code:
+Windows Native Code
+-------------------
 
-To build the Windows native code, load the Visual C++ project file
-in "win32/win32serial.vcproj".  Use Build Solution to compile the
-project.  Two configurations are supported, "Release" and "Debug".
+To build the Windows native code, you need the freely (as in free
+beer) downloadable Microsoft Windows SDK version 7.1 (corresponding
+to VC++ 10.0 and Visual Studio 2010). You'll find it here:
 
-When the build is complete, a post build trigger should copy the
-executeable "serial_esock.exe" from win32/Debug or win32/Release
-to ../priv/bin, the directory where the gen_serial application will
-expect to find the executable file.
+URL: http://www.microsoft.com/download/en/details.aspx?id=8279 
+
+You must consult the environment setup (paths to various toolchain
+components) in win32/make.bat. The settings in this file are suitable
+if you are running Windows 7 and you have accepted the default
+locations when installing the Windows SDK.
+
+The aforementioned batch executable make.bat must be run to invoke the
+Microsoft C/C++ compiler. This will generate serial_esock.exe. You
+must manually copy it to priv/bin under the gen_serial root directory.
+
+Note: there is already a pre-compiled serial_esock.exe in this
+directory of the distribution, for those who do not want to bother
+with all the above. However, if you change the C sources (either the
+generic erlang_serial.c or those in the win32/ subdirectory) then you
+need to recompile this executable for your changes to take effect.
 
 
-UNIX Native Code:
+UNIX Native Code
+----------------
 
-Not ready at this time.  It cannot be built.  Look in 0.2 for the
-UNIX version.
+The code is POSIX compatible so it should compile without too much
+hassle on a number of UNIX-like platforms besides Linux where it has been
+developed and tested. Comments/patches welcome if you manage to do so.
+
+There is a Makefile in the posix/ subdirectory, so assuming you have a
+reasonably sane UNIX development environment (make, cc, etc.) you
+should be able to simply issue 'make' and obtain the serial_esock
+executable. This executable will be copied to the priv/bin directory
+automatically.
+
+Note: it is expected that compiling programs from source does not pose
+significant inconveniences to anyone. For this reason, and the fact
+that distributing executable binaries is not a generally feasible
+approach on UNIX platforms, a pre-built binary is NOT distributed.

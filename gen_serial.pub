@@ -1,7 +1,9 @@
 {name, "gen_serial"}.
-{vsn, {0,1}}.
+{vsn, {0,2}}.
 {summary, "Generic Serial Driver for UNIX and Windows."}.
-{author, "Shawn Pearce", "spearce+erlang@spearce.org", ""}.
+{url, "http://github.com/tomszilagyi/gen_serial"}.
+{author, {"Tom Szilagyi", "tomszilagyi@gmail.com", {2014,06,30}}}.
+{author, {"Shawn Pearce", "spearce+erlang@spearce.org", {2004,02,24}}}.
 {keywords, ["serial", "gen_serial"]}.
 {needs, []}.
-{abstract,"This is a port driver program for communication between Erlang and standard RS-232 serial ports."}.
+{abstract,"Port driver program for communication between Erlang and standard RS-232 serial ports"}.

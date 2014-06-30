@@ -1,8 +1,12 @@
+gen_serial: generic serial port driver for Erlang
+-------------------------------------------------
 
-		gen_serial 0.1
-		---------------
+The latest version is always available from:
+http://github.com/tomszilagyi/gen_serial
 
-(See doc/gen_serial.html for API documentation.)
+
+See doc/gen_serial.html for API documentation.
+
 
 gen_serial is a generic serial port driver to allow Erlang applications
 to use the host's RS-232 serial ports through a single cross platform
@@ -10,24 +14,26 @@ API.
 
 Each serial port is managed in its own host OS process, ensuring that
 the stability of the Erlang node is not comprimised by the gen_serial
-driver.  The port driver processes cost about 1 MB of memory on Windows
+driver. The port driver processes cost about 1 MB of memory on Windows
 (each), a relatively high price to pay for stablity.  :-)
 
 
-Currently this driver and API only supports Windows operating systems.
-UNIX support is planned for the 0.2 release in the near future.  This
-version of the driver was developed and tested on Windows XP SP1, but
-should work on Window 95/98/ME, Windows NT 4, 2000, XP and 2003.  The
-enclosed Microsoft Visual Studio project file was built with Microsoft
-Visual C+++ version 7.1, aka "Microsoft Development Environment 2003".
+Currently this driver and API has been tested on Windows XP, Windows 7
+and Linux (kernel 3.8.0). It should also work on Windows 95/98/ME,
+Windows NT 4, 2000, 2003, and any POSIX compatible (UNIX-like) system.
 
 
-Since the gen_serial module locates the serial_esock.exe binary through
-its priv directory, it is necessary to put the path of the gen_serial-0.1
+Since the gen_serial module locates the serial_esock(.exe) binary through
+its priv directory, it is necessary to put the path of the gen_serial-0.2
 directory into the code server.  This can be done on the command line
 with -pa:
 
-	erl -pa /path/to/gen_serial-0.1/ebin
+	erl -pa /path/to/gen_serial-0.2/ebin
+
+Alternatively, installing the gen_serial-0.2 directory under the lib/
+directory of your Erlang installation (eg. C:\Erlang\lib\ on Windows,
+/opt/erlang/lib/erlang/lib/ on Linux) to reside among all other
+installed applications will allow Erlang to find it automatically.
 
 
 A simple test module is also provided as gen_serial_test.  This has some
@@ -37,7 +43,7 @@ between two networked Erlang nodes (using a serial cable with a null
 modem to connect the two hosts).
 
 
-Building gen_serial is pretty simple:
+Building the Erlang code of gen_serial is pretty simple:
 
 	cd src
 	make
@@ -45,20 +51,14 @@ Building gen_serial is pretty simple:
 The Makefile may need to be modified to get paths right, but only if
 you want to regenerate the documentation with edoc.
 
-The native code is shipped as a binary for Windows, but the source is
-in c_src.  See the README there if you would like to build binary
-yourself.  (Strongly recommended.)
+The backend (native code) is under c_src and can be compiled on the
+respective target platform (see README in c_src). A pre-built binary
+for Windows is shipped.
 
 
-gen_serial may become relatively important to me in the near future (for
-another project), so I expect development to continue in ernest until
-the driver is stable and production quality.  Cross platform support
-(UNIX and Windows) is a key feature to me, so look for it soon in 0.2.
-Windows support came first as folks said it couldn't be done...  since
-I am a UNIX guy, UNIX support will be a breeze.
+Feedback, patches, pull requests welcome.
 
 Have fun!
 
-		Shawn Pearce
-		spearce+erlang@spearce.org
-
+		Tom Szilagyi
+		tomszilagyi@gmail.com
