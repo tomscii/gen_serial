@@ -14,3 +14,5 @@ set PATH=c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin;c:\Program F
 
 
 cl /O2 /Feserial_esock.exe /DWIN32 /I.. win32_main.c win32pipe_threads.c win32serial_overlapped.c ..\erlang_serial.c /link ws2_32.lib
+
+pause
