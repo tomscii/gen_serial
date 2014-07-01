@@ -2,8 +2,12 @@
 %%
 %% <p>
 %% The gen_serial API allows Erlang programs to make use of standard
-%% RS-232 serial ports on both Windows and UNIX platforms, from a
-%% common interface module.
+%% serial port devices on both Windows and POSIX (Linux and UNIX-like)
+%% platforms, from a common interface module. As the native serial
+%% port handling services of the underlying operating system are used,
+%% this module supports any device supported by the operating system,
+%% ie. not just traditional RS-232 serial ports, but also USB-serial
+%% converters and the like.
 %% </p>
 %%
 %% <p>
@@ -25,13 +29,7 @@
 %% </p>
 %%
 %% <p>
-%% Unlike other Erlang communication APIs, gen_serial only allows use
-%% of binaries and lists of binaries.  Character lists (aka strings
-%% or IO lists) are just simply not supported at this time.
-%% </p>
-%%
-%% <p>
-%% <i>Disclaimer: This is alpha level code.  Have fun!</i>
+%% <i>Disclaimer: This is alpha level code. Have fun!</i>
 %% </p>
 %%
 %% <a name="-messages"><h3>Port Owner Messages:</h3></a>
@@ -51,7 +49,7 @@
 %%	Sent when a packet of data has been received and decoded by the
 %%	serial port driver.  If there is a packet level protocol being
 %%	used by the driver, Packet will contain one complete packet of
-%%	data.  If no packet level protocol is using, Packet will typically
+%%	data.  If no packet level protocol is used, Packet will typically
 %%	be a single byte, as the port driver is significantly faster than
 %%	the serial port.
 %%	</p>
@@ -96,7 +94,8 @@
 %% <p>Size of the OS receive buffer (for data coming in from the serial
 %% port).  Specified in bytes, must be between 32 and 32,768.  Not
 %% all OSes will allow all values in this range.  Default is 4096,
-%% which should work on all platforms.</p>
+%% which should work on all platforms. Currently this setting has no
+%% effect on the POSIX backend.</p>
 %%
 %% <b>{sndbuf, Bytes}</b><br />
 %%	<ul>
@@ -105,7 +104,8 @@
 %% <p>Size of the OS send buffer (for data going out the serial
 %% port).  Specified in bytes, must be between 32 and 32,768.  Not
 %% all OSes will allow all values in this range.  Default is 4096,
-%% which should work on all platforms.</p>
+%% which should work on all platforms. Currently this setting has no
+%% effect on the POSIX backend.</p>
 %%
 %% <b>{bufsz, Bytes}</b><br />
 %%	<ul>
@@ -131,25 +131,38 @@
 %% <b>register</b><br />
 %% <p>Same as {register, true}.</p>
 %%
-%% <b>{baud, BitsPerSecond}</b><br />
+%% <b>{baud, BitsPerSecond}</b> or <b>{baudrate, BitsPerSecond}</b><br/>
+%% <p>
+%% Supported by Windows backend:
 %%	<ul>
 %%		<li>BitsPerSecond = 110 | 300 | 600 | 1200 | 2400 | 4800
 %%			| 9600 | 14400 | 19200 | 38400 | 56000 | 57600
 %%			| 115200 | 128000 | 256000 | integer()</li>
 %%	</ul>
-%% <p>Set the baud rate of the serial port, as the number of bits
-%% to transfer per second.  Most serial ports will only accept a subset
-%% of the baud rates listed above, but this driver will accept any
-%% baud rate over 1 bit per second and attempt to configure the
-%% OS for that rate.  If a rate is rejected, its because the OS cannot
-%% support that rate, or the hardware cannot support that rate.
-%% Default is 9600 as this is extremely common.</p>
+%% Supported by POSIX backend:
+%%	<ul>
+%%		<li>BitsPerSecond = 110 | 134 | 150 | 200 | 300 | 600 | 1200
+%%                      | 2400 | 4800 | 9600 | 19200 | 38400 | 57600 | 115200
+%%                      | 230400 | 460800 | 500000 | 576000 | 921600 | 1000000
+%%                      | 1152000 | 1500000 | 2000000 | 2500000 | 3000000
+%%                      | 3500000 | 4000000</li>
+%%	</ul>
+%% </p>
+%% <p>Set the baud rate of the serial port, as the number of bits to
+%% transfer per second.  Most serial ports will only accept a subset
+%% of the baud rates listed above. The interface will accept any baud
+%% rate over 1 bit per second and attempt to configure the backend
+%% driver for that rate. If a rate listed above for the appropriate
+%% backend is rejected, it is because the OS cannot support that rate,
+%% or the hardware cannot support that rate. Default is 9600 as this
+%% is extremely common.</p>
 %%
 %% <b>{bytesz, BitsPerByte}</b><br />
 %%	<ul>
-%%		<li>BitsPerByte = 6 | 7 | 8</li>
+%%		<li>BitsPerByte = 5 | 6 | 7 | 8</li>
 %%	</ul>
-%% <p>Set the number of bits per data byte.  Default is 8.</p>
+%% <p>Set the number of bits per data byte. Default is 8. Again, the
+%% OS and the device may or may not support a particular setting.</p>
 %%
 %% <b>{parity, Parity}</b><br />
 %%	<ul>
@@ -161,14 +174,23 @@
 %%	<ul>
 %%		<li>StopBits = 1 | 1.5 | 2</li>
 %%	</ul>
-%% <p>Set the number of stop bits used.  Default is 1.</p>
+%% <p>Set the number of stop bits used.  Default is 1. A setting of 1.5
+%% is unsupported by the POSIX backend (it has the same effect as 1).</p>
 %%
 %% <b>{flow_control, Type}</b><br />
 %%	<ul>
 %%		<li>Type = none | software | hardware</li>
 %%	</ul>
 %% <p>Select the type of flow control which will be used by the serial
-%% port.  Default is hardware as it is the most reliable form.</p>
+%% port. Hardware is also known as RTS/CTS and software as XON/XOFF
+%% flow control. Default is hardware as it is the most reliable
+%% form.</p>
+%%
+%% <h4>Packet options</h4>
+%%
+%% <p>These refer to the incoming packet only. Outgoing packets are
+%% sent directly in whatever pieces and units of data the user calls
+%% the send functions with.</p>
 %%
 %% <b>{packet, none}</b><br />
 %% <p>No packet formatting is handled by the driver.  All bytes are
@@ -199,7 +221,7 @@
 %% <b>{packet, crlf}</b><br />
 %% <p>Packets are line oriented, terminated by a carriage return / 
 %% line feed pair ("\r\n", ASCII value 13, hex 0D followed by ASCII value
-%% 10 hex 16#0A).  If this packet format is used, the option 'bufsz' must
+%% 10 hex 0A).  If this packet format is used, the option 'bufsz' must
 %% be set large enough to hold the longest line, including the
 %% carriage return and line feed characters.  The carriage return and
 %% line feed are both stripped from the data packet before the
@@ -240,11 +262,12 @@
 %% set to 'false'.  The 'once' option prevents the port owner from being
 %% flooded with data on a fast link.  If 'false', the port owner will
 %% not receive any data packets at all, until set to 'true' or 'once'.
+%% <b>Currently only active mode is supported!</b>
 %% </p>
 %%
-%% <h3>Homepage:</h3>
-%% <a href="http://www.spearce.org/projects/erlang/gen_serial/">
-%% http://www.spearce.org/projects/erlang/gen_serial/</a>
+%% <h3>Get the latest version from:</h3>
+%% <a href="http://github.com/tomszilagyi/gen_serial">
+%% http://github.com/tomszilagyi/gen_serial</a>
 %%
 -module(gen_serial).
 
@@ -390,40 +413,41 @@
 %% terminates, the port will be automatically closed as well.
 %% </p>
 %%
-open(N, L) when is_integer(N) ->
+open(Device, Options) when is_integer(Device) ->
 	case os:type() of
-	{unix, linux} ->	open("/dev/tty" ++ integer_to_list(N), L);
-	{unix, _} ->		open("/dev/tty" ++ integer_to_list($a + N), L);
-	{win32, _} ->		open("COM" ++ integer_to_list(N), L);
-	_ ->				open(integer_to_list(N), L)
+	{unix, linux} ->	open("/dev/tty" ++ integer_to_list(Device), Options);
+	{unix, _} ->		open("/dev/tty" ++ integer_to_list($a + Device), Options);
+	{win32, _} ->		open("COM" ++ integer_to_list(Device), Options);
+	_ ->				open(integer_to_list(Device), Options)
 	end;
-open(Device, Opts) when is_atom(Device) ->
+open(Device, Options) when is_atom(Device) ->
 	case os:type() of
-	{unix, _} ->		open("/dev/" ++ atom_to_list(Device), Opts);
-	 _ ->				open(atom_to_list(Device), Opts)
+	{unix, _} ->		open("/dev/" ++ atom_to_list(Device), Options);
+	 _ ->				open(atom_to_list(Device), Options)
 	 end;
-open(Device, Opts) ->
-	case cfg(Opts, cfg_defaults()) of
+open(Device, Options) ->
+	case cfg(Options, cfg_defaults()) of
 	Cfg when is_record(Cfg, serial_cfg) ->	startup_port(Device, Cfg);
 	Other ->							Other
 	end.
 
 
-%% @spec (PortRef, Opts) -> ok | {error, Reason}
+%% @spec (PortRef, Options) -> ok | {error, Reason}
 %%		PortRef = port_ref()
-%%		Opts = [{active, When}]
+%%		Options = [{active, When}]
 %%		When = false | true | once
 %%		Reason = term()
 %% @doc Change the current options on the serial port.
 %%
 %% <p>
-%% Currently on the active flag can be changed.
+%% Currently only the active flag can be changed, but note that only
+%% {active, true} is supported.
 %% </p>
 %% 
 %% <p>See <a href="#-options-active">{active, When}</a>.</p>
 %%
-setopts(PortRef, Opts=[{active, _}]) ->
-	Cfg = cfg(Opts, cfg_defaults()),
+setopts(PortRef, Options=[{active, _}]) ->
+	Cfg = cfg(Options, cfg_defaults()),
 	Active = Cfg#serial_cfg.initially_active,
 	true = port_command(PortRef, <<?PACKET_ACTIVE:8, Active:8>>),
 	ok.
@@ -475,7 +499,7 @@ close(PortRef) ->
 %% @doc Close an open serial port.
 %%
 %% <p>
-%% This call is not really necessary, as the port will automatically
+%% This call is not always necessary, as the port will automatically
 %% close when the port owner terminates.
 %% </p>
 %%
@@ -526,6 +550,13 @@ close(PortRef, Timeout) ->
 %%		Length = integer()
 %%		Packet = binary()
 %%		Reason = term()
+%%
+%% @doc Read data from an open serial port.
+%%
+%% <p><b>Note: currently only active mode is supported and thus
+%% recv/2 and recv/3 are not implemented by the backend driver.
+%% Do not use them!</b></p>
+%%
 %% @equiv recv(PortRef, Length, infinity)
 %%
 recv(PortRef, Len) ->
@@ -555,18 +586,22 @@ recv(PortRef, Len) ->
 %% <a href="#recv-3">recv/3</a>.
 %% </p>
 %%
+%% <p><b>Note: currently only active mode is supported and thus
+%% recv/2 and recv/3 are not implemented by the backend driver.
+%% Do not use them!</b></p>
+%%
 recv(PortRef, Len, Timeout) ->
 	call(PortRef, {recv, Len}, Timeout).
 
 
 %% @spec (PortRef, Packet) -> ok
 %%		PortRef = port_ref()
-%%		Packet = binary() | [binary()]
+%%		Packet = iodata()
 %% @doc Partially asynchronous data transmission.
 %%
 %% <p>
 %% Sends data through the serial port.  The caller sends the data
-%% out the port directly, which means the caller may block indefinately
+%% out the port directly, which means the caller may block indefinitely
 %% if all IO buffers are full and flow control has broken down.  This
 %% is the fastest way to send data to the serial port, as it does not
 %% have to pass through the interface process first, but may be risky
@@ -575,7 +610,7 @@ recv(PortRef, Len, Timeout) ->
 %%
 %% <p>
 %% When this call returns, the data may only be queued for delivery.
-%% There is no assurances that the data was actually transmitted
+%% There are no guarantees that the data was actually transmitted
 %% out the serial port.  Use <a href="#flush-1">flush/1</a>,
 %% <a href="#flush-2">flush/2</a> or <a href="#bsend-2">bsend/2</a>
 %% to wait for the data to have actually been sent out the serial
@@ -598,7 +633,7 @@ send(#gen_serial{port = Port}, Data) ->
 
 %% @spec (PortRef, Packet) -> ok
 %%		PortRef = port_ref()
-%%		Packet = binary() | [binary()]
+%%		Packet = iodata()
 %% @doc Asynchronous data transmission.
 %%
 %% <p>
@@ -628,7 +663,7 @@ asend(#gen_serial{pid = Pid}, Data) ->
 
 %% @spec (PortRef, Packet) -> ok | {error, Reason}
 %%		PortRef = port_ref()
-%%		Packet = binary() | [binary()]
+%%		Packet = iodata()
 %%		Reason = term()
 %% @equiv bsend(PortRef, Packet, infinity)
 %%
@@ -639,7 +674,7 @@ bsend(PortRef, Data) ->
 %% @spec (PortRef, Packet, Timeout) ->
 %%			ok | {error, timeout} | {error, Reason}
 %%		PortRef = port_ref()
-%%		Packet = binary() | [binary()]
+%%		Packet = iodata()
 %%		Timeout = infinity | time_in_ms()
 %%		Reason = term()
 %% @doc Synchronous data transmission.
@@ -659,12 +694,12 @@ bsend(PortRef, Data) ->
 %% </p>
 %%
 %% <p>
-%% This function is roughly equivalent to (but easier to use):
+%% This function is equivalent to (but easier to use than):
 %% </p>
 %% <pre>
 %%		case send(PortRef, Packet) of
-%%		ok ->    flush(PortRef, Timeout);
-%%		Other -> Other
+%%		    ok ->    flush(PortRef, Timeout);
+%%		    Other -> Other
 %%		end
 %% </pre>
 %%
@@ -727,7 +762,7 @@ startup_port(Device, Cfg) ->
 	{'EXIT', Pid, R} ->	{error, R}
 	end.
 
-%% @hide
+%% @hidden
 %% @doc <b>This is an internal function: do not use.</b>  Sets up a
 %%		newly spawned interface process.
 %%
@@ -739,7 +774,7 @@ startup_port(Device, Cfg) ->
 %% operating system calls.
 %% </p>
 %%
-%% @see loop/3
+%% @see loop/4
 %%
 init(Owner, Device, Cfg) ->
 	case open_ioport(Device, Cfg) of
@@ -817,8 +852,8 @@ register_myself(Device, Cfg=#serial_cfg{e_register = true}) ->
 			fun(C) when C >= $a, C =< $z ->		true;
 			   (C) when C >= $A, C =< $Z ->		true;
 			   (C) when C >= $0, C =< $9 ->		true;
-			   ($_) ->							true;
-			   (_) ->							false
+			   ($_) ->			        true;
+			   (_) ->				false
 			end,
 			Device
 		)
@@ -832,7 +867,7 @@ register_myself(Device, Cfg=#serial_cfg{e_register = Name}) ->
 	{'EXIT', Reason}	-> 	{error, Reason}
 	end.
 
-%% @hide
+%% @hidden
 %% @doc <b>This is an internal function: do not use.</b>  Main loop
 %%		of an interface process.
 %% @see init/3
@@ -1082,7 +1117,10 @@ cfg([{register, Name} | T], C) when is_atom(Name) ->
 cfg([{baud, V} | T], C) when is_integer(V), V >= 1 ->
 	cfg(T, C#serial_cfg{baud_rate = V});
 
-cfg([{bytesz, V} | T], C) when is_integer(V), V >= 6, V =< 8 ->
+cfg([{baudrate, V} | T], C) when is_integer(V), V >= 1 ->
+	cfg(T, C#serial_cfg{baud_rate = V});
+
+cfg([{bytesz, V} | T], C) when is_integer(V), V >= 5, V =< 8 ->
 	cfg(T, C#serial_cfg{byte_size = V});
 
 cfg([{parity, none} | T], C) ->
