@@ -142,6 +142,7 @@ int main(int argc, char* argv[])
 	struct pipe_channel*		erts;
 	struct serial_port*			port;
 	char*						port_name;
+	char portname_buf[128];
 	int							buffer_size;
 
 #ifdef _DEBUG
@@ -168,6 +169,15 @@ int main(int argc, char* argv[])
 	}
 
 	port_name = argv[1];
+
+	/* for COM10 and above, we need to prepend \\.\
+	 * see: http://support.microsoft.com/kb/115831
+	 */
+	if (!strncmp(port_name, "COM", 3) && atoi(port_name+3) > 9) {
+	        sprintf(portname_buf, "\\\\.\\%s", port_name);
+	        port_name = portname_buf;
+	}
+
 	buffer_size = atoi(argv[2]);
 	if (buffer_size < 128)
 	{
