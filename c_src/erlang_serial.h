@@ -524,4 +524,10 @@ extern int serial_port_watch_serialw (struct serial_port* port);
  */
 extern int serial_port_isdead (struct serial_port* port);
 
+/* Determine if a given error code (received via errno on UNIX or
+ * GetLastError() on Windows) is fatal. If true, the port will be
+ * flagged as dead and the driver will terminate.
+ */
+int is_fatal_error (int errcode);
+
 #endif

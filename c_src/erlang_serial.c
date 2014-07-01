@@ -779,6 +779,13 @@ void serial_port_ertsw (struct serial_port* port)
 				&port->lastError,
 				sizeof(port->lastError));
 
+			/* In case of a non-recoverable error, signal the port as dead.
+			 * This will cause the port driver process to exit.
+			 */
+			if (is_fatal_error(port->lastError.error_code)) {
+			        port->isDead = 1;
+			}
+
 			port->lastError.error_code = 0;
 			port->lastError.error_msg[0] = 0;
 

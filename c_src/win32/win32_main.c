@@ -6,6 +6,14 @@
 #include "erlang_serial.h"
 #include "win32serial.h"
 
+int is_fatal_error (int errcode)
+{
+        if (errcode == ERROR_OPERATION_ABORTED) {
+                return 1;
+        }
+        return 0;
+}
+
 void windows_error (char* operation)
 {
 #ifdef _DEBUG

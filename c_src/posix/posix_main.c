@@ -11,14 +11,18 @@
 
 #include "../erlang_serial.h"
 
+int is_fatal_error(int errcode)
+{
+        if (errcode == EIO || errcode == EPIPE) {
+                return 1;
+        }
+        return 0;
+}
+
 struct serial_posix {
 	struct serial_channel channel;
 	int fd;
-
-	/* Error of the last call. This is directly from errno */
-	int lastError;
-
-	/* more private fields... */
+	int lastError; /* Error of the last call. This is directly from errno */
 };
 
 struct serial_channel *serial_open(char *port_name, int bufsz)
