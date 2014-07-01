@@ -1,0 +1,10 @@
+Tom Szilagyi <tomszilagyi@gmail.com>:
+
+Released 0.2 in July 2014 with a backend driver added for POSIX (Linux
+and UNIX-like) operating systems along with small fixes.
+
+
+Shawn Pearce <spearce+erlang@spearce.org>:
+
+Original author of gen_serial; released 0.1 in February 2004 with the
+general Erlang API and a Windows backend driver in place.
