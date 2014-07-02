@@ -1,0 +1,13 @@
+c_src/*~
+c_src/*.o
+c_src/posix/*~
+c_src/posix/*.o
+c_src/posix/serial_esock
+c_src/win32/*~
+c_src/win32/*.obj
+c_src/win32/serial_esock.exe
+ebin/*.beam
+priv/bin/serial_esock
+priv/bin/serial_esock.exe
+src/*~
+*~
