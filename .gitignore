@@ -8,6 +8,5 @@ c_src/win32/*.obj
 c_src/win32/serial_esock.exe
 ebin/*.beam
 priv/bin/serial_esock
-priv/bin/serial_esock.exe
 src/*~
 *~
