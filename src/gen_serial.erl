@@ -29,6 +29,13 @@
 %% </p>
 %%
 %% <p>
+%% Unlike other Erlang communication APIs, gen_serial only allows use
+%% of binaries and lists of binaries as packet input. Character lists
+%% (aka strings or IO lists) are just simply not supported at this
+%% time.
+%% </p>
+%%
+%% <p>
 %% <i>Disclaimer: This is alpha level code.</i>
 %% The latest version is available from:
 %% <a href="http://github.com/tomszilagyi/gen_serial">
@@ -610,7 +617,7 @@ recv(PortRef, Len, Timeout) ->
 
 -spec send(PortRef, Packet) -> ok when
       PortRef :: port_ref(),
-      Packet :: iodata().
+      Packet :: binary() | [binary()].
 
 send(#gen_serial{port = Port}, Data) ->
     true = port_command(Port, [<<?PACKET_DATA:8>> | Data]),
@@ -640,7 +647,7 @@ send(#gen_serial{port = Port}, Data) ->
 
 -spec asend(PortRef, Packet) -> ok when
       PortRef :: port_ref(),
-      Packet :: iodata().
+      Packet :: binary() | [binary()].
 
 asend(#gen_serial{pid = Pid}, Data) ->
     Pid ! {send, Data},
@@ -651,7 +658,7 @@ asend(#gen_serial{pid = Pid}, Data) ->
 
 -spec bsend(PortRef, Packet) -> ok | {error, Reason} when
       PortRef :: port_ref(),
-      Packet :: iodata(),
+      Packet :: binary() | [binary()],
       Reason :: term().
 
 bsend(PortRef, Data) ->
@@ -690,7 +697,7 @@ bsend(PortRef, Data) ->
 -spec bsend(PortRef, Packet, Timeout) ->
 		   ok | {error, timeout} | {error, Reason} when
       PortRef :: port_ref(),
-      Packet :: iodata(),
+      Packet :: binary() | [binary()],
       Timeout :: infinity | time_in_ms(),
       Reason :: term().
 
