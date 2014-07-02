@@ -276,6 +276,8 @@
 	 recv/2, recv/3,
 	 send/2, asend/2, bsend/2, bsend/3, flush/1, flush/2]).
 
+-export_type([port_ref/0]).
+
 %% Interface server loop.  This is not a public export, but is used
 %% to support code reloading.
 -export([init/3, loop/4]).
@@ -377,7 +379,7 @@
 %%
 %% <p>See <a href="#-options">Available Options</a>.</p>
 
--opaque port_ref() :: term().
+-opaque port_ref() :: #gen_serial{}.
 %% <p>Opaque term returned by {@link open/2} to allow callers to
 %% interact with an open serial port. The internals of the term should
 %% not be directly accessed or modified by the caller; and the caller
@@ -472,7 +474,8 @@ set_owner(PortRef) ->
 
 -spec set_owner(PortRef, To) -> ok | {error, Reason} when
       PortRef :: port_ref(),
-      To :: pid().
+      To :: pid(),
+      Reason :: term().
 
 set_owner(PortRef, To) ->
 	call(PortRef, {set_owner, To}, infinity).
@@ -827,7 +830,7 @@ configure_ioport(Port, Cfg) ->
 	    {error, Reason}
     end.
 
-register_myself(Device, Cfg = #serial_cfg{e_register = false}) ->
+register_myself(_Device, #serial_cfg{e_register = false}) ->
     {ok, self()};
 register_myself(Device, Cfg=#serial_cfg{e_register = true}) ->
     Name = lists:map(fun(C) when C >= $A, C =< $Z -> C + ($a - $A);
@@ -840,9 +843,8 @@ register_myself(Device, Cfg=#serial_cfg{e_register = true}) ->
 				     (_) -> false
 				  end,
 				  Device)),
-    register_myself(Device,
-		    Cfg#serial_cfg{e_register = list_to_atom(Name)});
-register_myself(Device, Cfg=#serial_cfg{e_register = Name}) ->
+    register_myself(Device, Cfg#serial_cfg{e_register = list_to_atom(Name)});
+register_myself(_Device, #serial_cfg{e_register = Name}) ->
     case catch register(Name, self()) of
 	true ->	{ok, Name};
 	{'EXIT', Reason} -> {error, Reason}
@@ -871,7 +873,7 @@ loop(DeviceName, PortRef, Owner, Port) ->
 		     translate_error(ECode, binary_to_list(EMsg))},
 	    ?MODULE:loop(DeviceName, PortRef, Owner, Port);
 
-	{Port, {data, <<?PACKET_OK:8, PacketType:8>>}} ->
+	{Port, {data, <<?PACKET_OK:8, _PacketType:8>>}} ->
 	    % Unexpected OK message.  Most likely a reply to a request
 	    % we sent earlier (like PACKET_FLUSH) but that was wedged in
 	    % a buffer longer than we expected.  Just ignore it.
@@ -895,7 +897,7 @@ loop(DeviceName, PortRef, Owner, Port) ->
 	    port_command(Port, [<<?PACKET_DATA:8>> | Data]),
 	    ?MODULE:loop(DeviceName, PortRef, Owner, Port);
 
-	{'$call', From, {recv, Len}} ->
+	{'$call', _From, {recv, _Len}} ->
 	    % FIXME
 	    ?MODULE:loop(DeviceName, PortRef, Owner, Port);
 
@@ -988,7 +990,7 @@ clone_esock(Src, Target) ->
     TPath = filename:join(priv_bin_dir(), Target),
     case catch file:copy(SPath, TPath) of
 	{ok, _} -> Target;
-	Other -> Src
+	_ -> Src
     end.
 
 priv_bin_dir() ->
@@ -1023,8 +1025,8 @@ translate_error(Code, Msg) ->
 	_ -> {Code, Msg}
     end.
 
-translate_win32_error(2, Msg) -> enodev;   % ERROR_FILE_NOT_FOUND
-translate_win32_error(87, Msg) -> einval;  % ERROR_INVALID_PARAMETER
+translate_win32_error(2, _) -> enodev;   % ERROR_FILE_NOT_FOUND
+translate_win32_error(87, _) -> einval;  % ERROR_INVALID_PARAMETER
 translate_win32_error(Code, Msg) -> {Code, Msg}.
 
 translate_unix_error(Code, Msg) -> {Code, Msg}.
@@ -1174,7 +1176,7 @@ cfg([{active, once} | T], C) ->
 
 cfg([], C) -> C;
 
-cfg([X | T], _) -> {error, {badarg, X}}.
+cfg([X | _], _) -> {error, {badarg, X}}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
