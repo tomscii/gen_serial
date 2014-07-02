@@ -48,7 +48,10 @@ _clean:
 _clean_doc:
 	-rm -f $(HTML_OUT)/*.html
 
-.erl.beam:
+$(BEAM_OUT):
+	mkdir $@
+
+.erl.beam: $(BEAM_OUT)
 	$(ERLC) -o $(BEAM_OUT) $<
 
 .erl.html:

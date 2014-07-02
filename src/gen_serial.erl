@@ -202,12 +202,12 @@
 %% the send functions with.</p>
 %%
 %% <b>{packet, none}</b><br/>
-%% <p>No packet formatting is handled by the driver.  All bytes are
-%% delivered as they are received, typically one byte at a time (however
-%% if the system is very busy multiple bytes may be sent in a single
-%% binary).  If the application needs to assemble packets from the
-%% data, it is up to the application developer to properly buffer
-%% data and assemble the packets prior to processing.</p>
+%% <p>No packet formatting is done by the driver. All bytes are
+%% delivered as they are received, one or more bytes at a time
+%% (depending on the interface speed and the speed and workload of the
+%% system).  If the application needs to assemble packets from the
+%% data, it is up to the application developer to properly buffer data
+%% and assemble the packets prior to processing.</p>
 %%
 %% <b>{packet, cr}</b><br />
 %% <p>Packets are line oriented, terminated by a single carriage

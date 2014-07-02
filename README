@@ -1,9 +1,6 @@
 gen_serial: generic serial port driver for Erlang
 -------------------------------------------------
 
-The latest version is always available from:
-http://github.com/tomszilagyi/gen_serial
-
 
 See doc/gen_serial.html for API documentation.
 
@@ -13,14 +10,14 @@ to use the host's RS-232 serial ports through a single cross platform
 API.
 
 Each serial port is managed in its own host OS process, ensuring that
-the stability of the Erlang node is not comprimised by the gen_serial
+the stability of the Erlang node is not compromised by the gen_serial
 driver. The port driver processes cost about 1 MB of memory on Windows
-(each), a relatively high price to pay for stablity.  :-)
+(each), a relatively high price to pay for stablity.
 
 
 Currently this driver and API has been tested on Windows XP, Windows 7
-and Linux (kernel 3.8.0). It should also work on Windows 95/98/ME,
-Windows NT 4, 2000, 2003, and any POSIX compatible (UNIX-like) system.
+and Linux. It should also work on Windows 95/98/ME, Windows NT 4,
+2000, 2003, and any POSIX compatible (UNIX-like) system.
 
 
 Since the gen_serial module locates the serial_esock(.exe) binary through
@@ -36,7 +33,7 @@ directory of your Erlang installation (eg. C:\Erlang\lib\ on Windows,
 installed applications will allow Erlang to find it automatically.
 
 
-A simple test module is also provided as gen_serial_test.  This has some
+A simple test module is also provided as gen_serial_test. This has some
 test cases which can be run in one Erlang node (using a loopback serial
 cable with a null modem installed and two serial ports on the host) or
 between two networked Erlang nodes (using a serial cable with a null
@@ -52,14 +49,17 @@ The Makefile may need to be modified to get paths right, but only if
 you want to regenerate the documentation with edoc.
 
 On Windows, the toplevel make.bat may be used to compile the Erlang
-code. The location of your Erlang installation needs to be edited if
-it is not C:\Erlang.
+code. The location of your Erlang installation needs to be edited in
+the batch file if it is not C:\Erlang.
 
 
 The backend (native code) is under c_src and can be compiled on the
 respective target platform (see README in c_src). A pre-built binary
-for Windows is shipped.
+for Windows is shipped, but it must be compiled before use on UNIX.
 
+
+The latest version is always available from:
+http://github.com/tomszilagyi/gen_serial
 
 Feedback, patches, pull requests welcome.
 
