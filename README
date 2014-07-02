@@ -40,18 +40,16 @@ between two networked Erlang nodes (using a serial cable with a null
 modem to connect the two hosts).
 
 
-Building the Erlang code of gen_serial is pretty simple:
+Building gen_serial on UNIX platforms is pretty simple:
 
-	cd src
-	make
+	./make.sh
 
-The Makefile may need to be modified to get paths right, but only if
-you want to regenerate the documentation with edoc.
+This will call erl -make with the Emakefile and then invoke the Makefile
+in c_src/posix to compile the POSIX driver backend.
 
 On Windows, the toplevel make.bat may be used to compile the Erlang
 code. The location of your Erlang installation needs to be edited in
 the batch file if it is not C:\Erlang.
-
 
 The backend (native code) is under c_src and can be compiled on the
 respective target platform (see README in c_src). A pre-built binary

@@ -1,23 +1,28 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Module gen_serial</title>
-<link rel="stylesheet" type="text/css" href="stylesheet.css">
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
 </head>
 <body bgcolor="white">
-<h1>Module gen_serial</h1>
-<ul><li>
-<a href="#index">Function index</a></li><li>
-<a href="#exported">Exported functions</a></li><li>
-<a href="#types">Data Types</a></li></ul>
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
 
-<h2>Description</h2>
-Generic serial port interface.
+<h1>Module gen_serial</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Generic serial port interface.
+
+
+<h2><a name="description">Description</a></h2><p>Generic serial port interface.</p>
  
   <p>
   The gen_serial API allows Erlang programs to make use of standard
-  RS-232 serial ports on both Windows and UNIX platforms, from a
-  common interface module.
+  serial port devices on both Windows and POSIX (Linux and UNIX-like)
+  platforms, from a common interface module. As the native serial
+  port handling services of the underlying operating system are used,
+  this module supports any device supported by the operating system,
+  ie. not just traditional RS-232 serial ports, but also USB-serial
+  converters and the like.
   </p>
  
   <p>
@@ -40,17 +45,21 @@ Generic serial port interface.
  
   <p>
   Unlike other Erlang communication APIs, gen_serial only allows use
-  of binaries and lists of binaries.  Character lists (aka strings
-  or IO lists) are just simply not supported at this time.
+  of binaries and lists of binaries as packet input. Character lists
+  (aka strings or IO lists) are just simply not supported at this
+  time.
   </p>
  
   <p>
-  <i>Disclaimer: This is alpha level code.  Have fun!</i>
+  <i>Disclaimer: This is alpha level code.</i>
+  The latest version is available from:
+  <a href="http://github.com/tomszilagyi/gen_serial">
+  http://github.com/tomszilagyi/gen_serial</a>
   </p>
  
   <a name="-messages"><h3>Port Owner Messages:</h3></a>
   <p>
-  The port owner (see <a href="#set_owner-2">set_owner/2</a>) is sent a
+  The port owner (see <a href="#set_owner-2"><code>set_owner/2</code></a>) is sent a
   series of messages containing data packets (when the port is active)
   and close and error messages, when the port is closed or an error
   related to the port occurs.
@@ -58,14 +67,14 @@ Generic serial port interface.
  
   <b>{serial, PortRef, Packet}</b><br>
  	<ul>
- 		<li>PortRef = <a href="#type-port_ref">port_ref()</a></li>
- 		<li>Packet = binary()</li>
+ 		<li>PortRef = <code><a href="#type-port_ref">port_ref()</a></code></li>
+ 		<li>Packet = <code>binary()</code></li>
  	</ul>
  	<p>
  	Sent when a packet of data has been received and decoded by the
  	serial port driver.  If there is a packet level protocol being
  	used by the driver, Packet will contain one complete packet of
- 	data.  If no packet level protocol is using, Packet will typically
+ 	data.  If no packet level protocol is used, Packet will typically
  	be a single byte, as the port driver is significantly faster than
  	the serial port.
  	</p>
@@ -79,8 +88,8 @@ Generic serial port interface.
  
   <b>{serial_error, PortRef, Error}</b><br>
  	<ul>
- 		<li>PortRef = <a href="#type-port_ref">port_ref()</a></li>
- 		<li>Error = term()</li>
+ 		<li>PortRef = <code><a href="#type-port_ref">port_ref()</a></code></li>
+ 		<li>Error = <code>term()</code></li>
  	</ul>
  	<p>
  	Sent when the port driver has detected a problem with the serial
@@ -89,7 +98,7 @@ Generic serial port interface.
  
   <b>{serial_closed, PortRef}</b><br>
  	<ul>
- 		<li>PortRef = <a href="#type-port_ref">port_ref()</a></li>
+ 		<li>PortRef = <code><a href="#type-port_ref">port_ref()</a></code></li>
  	</ul>
  	<p>
  	Sent when the port is being closed, before the port process goes
@@ -98,32 +107,33 @@ Generic serial port interface.
  
   <a name="-options"><h3>Available Options:</h3></a>
   <p>
-  The following options can be used in an
-  <a href="#type-option_list">option_list()</a> to configure the
-  serial port for communications with another device.
+  The following options can be used in an <code><a href="#type-option_list">option_list()</a></code> to
+  configure the serial port for communications with another device.
   </p>
  
   <b>{rcvbuf, Bytes}</b><br>
  	<ul>
- 		<li>Bytes = integer()</li>
+ 		<li>Bytes = <code>integer()</code></li>
  	</ul>
   <p>Size of the OS receive buffer (for data coming in from the serial
   port).  Specified in bytes, must be between 32 and 32,768.  Not
   all OSes will allow all values in this range.  Default is 4096,
-  which should work on all platforms.</p>
+  which should work on all platforms. Currently this setting has no
+  effect on the POSIX backend.</p>
  
   <b>{sndbuf, Bytes}</b><br>
  	<ul>
- 		<li>Bytes = integer()</li>
+ 		<li>Bytes = <code>integer()</code></li>
  	</ul>
   <p>Size of the OS send buffer (for data going out the serial
   port).  Specified in bytes, must be between 32 and 32,768.  Not
   all OSes will allow all values in this range.  Default is 4096,
-  which should work on all platforms.</p>
+  which should work on all platforms. Currently this setting has no
+  effect on the POSIX backend.</p>
  
   <b>{bufsz, Bytes}</b><br>
  	<ul>
- 		<li>Bytes = integer()</li>
+ 		<li>Bytes = <code>integer()</code></li>
  	</ul>
   <p>Size of the packet buffers.  If using delimited packets or
   line-oriented packets, the packet buffer must be sized larger than
@@ -134,7 +144,7 @@ Generic serial port interface.
  
   <b>{register, Name}</b><br>
  	<ul>
- 		<li>Name = true | false | atom()</li>
+ 		<li>Name = <code>true | false | atom()</code></li>
  	</ul>
   <p>Register the interface process as a named process, making it
   visible in the shell tools, etc.  If the atom 'true' is supplied
@@ -145,52 +155,68 @@ Generic serial port interface.
   <b>register</b><br>
   <p>Same as {register, true}.</p>
  
-  <b>{baud, BitsPerSecond}</b><br>
+  <b>{baud, BitsPerSecond}</b> or <b>{baudrate, BitsPerSecond}</b><br>
+  <p>
+  Supported by Windows backend:
  	<ul>
- 		<li>BitsPerSecond = 110 | 300 | 600 | 1200 | 2400 | 4800
- 			| 9600 | 14400 | 19200 | 38400 | 56000 | 57600
- 			| 115200 | 128000 | 256000 | integer()</li>
+ 		<li>BitsPerSecond = <code>110 | 300 | 600 | 1200 | 2400 | 4800 | 9600 | 14400 | 19200 | 38400 | 56000 | 57600 | 115200 | 128000 | 256000 | integer()</code></li>
  	</ul>
-  <p>Set the baud rate of the serial port, as the number of bits
-  to transfer per second.  Most serial ports will only accept a subset
-  of the baud rates listed above, but this driver will accept any
-  baud rate over 1 bit per second and attempt to configure the
-  OS for that rate.  If a rate is rejected, its because the OS cannot
-  support that rate, or the hardware cannot support that rate.
-  Default is 9600 as this is extremely common.</p>
+  Supported by POSIX backend:
+ 	<ul>
+ 		<li>BitsPerSecond = <code>110 | 134 | 150 | 200 | 300 | 600 | 1200 | 2400 | 4800 | 9600 | 19200 | 38400 | 57600 | 115200 | 230400 | 460800 | 500000 | 576000 | 921600 | 1000000 | 1152000 | 1500000 | 2000000 | 2500000 | 3000000 | 3500000 | 4000000</code></li>
+ 	</ul>
+  </p>
+  <p>Set the baud rate of the serial port, as the number of bits to
+  transfer per second.  Most serial ports will only accept a subset
+  of the baud rates listed above. The interface will accept any baud
+  rate over 1 bit per second and attempt to configure the backend
+  driver for that rate. If a rate listed above for the appropriate
+  backend is rejected, it is because the OS cannot support that rate,
+  or the hardware cannot support that rate. Default is 9600 as this
+  is extremely common.</p>
  
   <b>{bytesz, BitsPerByte}</b><br>
  	<ul>
- 		<li>BitsPerByte = 6 | 7 | 8</li>
+ 		<li>BitsPerByte = <code>5 | 6 | 7 | 8</code></li>
  	</ul>
-  <p>Set the number of bits per data byte.  Default is 8.</p>
+  <p>Set the number of bits per data byte. Default is 8. Again, the
+  OS and the device may or may not support a particular setting.</p>
  
   <b>{parity, Parity}</b><br>
  	<ul>
- 		<li>Parity = none | odd | even</li>
+ 		<li>Parity = <code>none | odd | even</code></li>
  	</ul>
   <p>Enable or disable parity checking.  Default is none.</p>
  
   <b>{stop_bits, StopBits}</b><br>
  	<ul>
- 		<li>StopBits = 1 | 1.5 | 2</li>
+ 		<li>StopBits = <code>1 | 1.5 | 2</code></li>
  	</ul>
-  <p>Set the number of stop bits used.  Default is 1.</p>
+  <p>Set the number of stop bits used.  Default is 1. A setting of 1.5
+  is unsupported by the POSIX backend (it has the same effect as 1).</p>
  
   <b>{flow_control, Type}</b><br>
  	<ul>
- 		<li>Type = none | software | hardware</li>
+ 		<li>Type = <code>none | software | hardware</code></li>
  	</ul>
   <p>Select the type of flow control which will be used by the serial
-  port.  Default is hardware as it is the most reliable form.</p>
+  port. Hardware is also known as RTS/CTS and software as XON/XOFF
+  flow control. Default is hardware as it is the most reliable
+  form.</p>
+ 
+  <h4>Packet options</h4>
+ 
+  <p>These refer to the incoming packet only. Outgoing packets are
+  sent directly in whatever pieces and units of data the user calls
+  the send functions with.</p>
  
   <b>{packet, none}</b><br>
-  <p>No packet formatting is handled by the driver.  All bytes are
-  delivered as they are received, typically one byte at a time (however
-  if the system is very busy multiple bytes may be sent in a single
-  binary).  If the application needs to assemble packets from the
-  data, it is up to the application developer to properly buffer
-  data and assemble the packets prior to processing.</p>
+  <p>No packet formatting is done by the driver. All bytes are
+  delivered as they are received, one or more bytes at a time
+  (depending on the interface speed and the speed and workload of the
+  system).  If the application needs to assemble packets from the
+  data, it is up to the application developer to properly buffer data
+  and assemble the packets prior to processing.</p>
  
   <b>{packet, cr}</b><br>
   <p>Packets are line oriented, terminated by a single carriage
@@ -199,7 +225,7 @@ Generic serial port interface.
   longest line, including the carriage return character.  The
   carriage return is stripped from the data packet before the
   packet is delivered to the application.</p>
-  <p>Same as {packet, {delimited, &lt;&lt;"\r">>}}.</p>
+  <p>Same as {packet, {delimited, &lt;&lt;"\r"&gt;&gt;}}.</p>
  
   <b>{packet, lf}</b><br>
   <p>Packets are line oriented, terminated by a single line feed
@@ -208,21 +234,22 @@ Generic serial port interface.
   longest line, including the line feed character.  The line feed
   is stripped from the data packet before the packet is delivered
   to the application.</p>
-  <p>Same as {packet, {delimited, &lt;&lt;"\n">>}}.</p>
+  <p>Same as {packet, {delimited, &lt;&lt;"\n"&gt;&gt;}}.</p>
  
   <b>{packet, crlf}</b><br>
   <p>Packets are line oriented, terminated by a carriage return /
   line feed pair ("\r\n", ASCII value 13, hex 0D followed by ASCII value
-  10 hex 16#0A).  If this packet format is used, the option 'bufsz' must
+  10 hex 0A).  If this packet format is used, the option 'bufsz' must
   be set large enough to hold the longest line, including the
   carriage return and line feed characters.  The carriage return and
   line feed are both stripped from the data packet before the
   packet is delivered to the application.</p>
-  <p>Same as {packet, {delimited, &lt;&lt;"\r\n">>}}.</p>
+  <p>Same as {packet, {delimited, &lt;&lt;"\r\n"&gt;&gt;}}.</p>
  
   <b>{packet, {delimited, Delimiter}}</b><br>
  	<ul>
- 		<li>Delimiter = binary() when size(Delimiter) =&lt; 8</li>
+ 		<li>Delimiter = <code>binary()</code>
+                               when size(Delimiter) =&lt; 8</li>
  	</ul>
   <p>Packets are variable length and delimited by a sequence of one
   or more bytes.  All bytes in Delimiter must occur in order to form
@@ -235,7 +262,7 @@ Generic serial port interface.
  
   <b>{packet, {fixed, Bytes}}</b><br>
  	<ul>
- 		<li>Bytes = integer()</li>
+ 		<li>Bytes = <code>integer()</code></li>
  	</ul>
   <p>Packets are fixed length in size, with every packet being exactly
   Bytes number of bytes in length.  The application will not be given a
@@ -245,7 +272,7 @@ Generic serial port interface.
  
   <a name="-options-active"><b>{active, When}</b></a><br>
  	<ul>
- 		<li>When = false | true | once</li>
+ 		<li>When = <code>false | true | once</code></li>
  	</ul>
   <p>Just like the active option to <code>ssl</code> or
   <code>gen_tcp</code>.  When set to 'true' the port owner will receive
@@ -254,199 +281,182 @@ Generic serial port interface.
   set to 'false'.  The 'once' option prevents the port owner from being
   flooded with data on a fast link.  If 'false', the port owner will
   not receive any data packets at all, until set to 'true' or 'once'.
+  <b>Currently only active mode is supported!</b>
   </p>
  
-  <h3>Homepage:</h3>
-  <a href="http://www.spearce.org/projects/erlang/gen_serial/">
-  http://www.spearce.org/projects/erlang/gen_serial/</a>
- 
-
-<h2><a name="index">Function Index</a></h2>
-
-<table width="100%" border="1"><tr><th colspan="2" align="left">Exported Functions</th></tr>
-<tr><td><a href="#asend-2">asend/2</a></td><td>Asynchronous data transmission.</td></tr>
-<tr><td><a href="#bsend-2">bsend/2</a></td><td><a href="#bsend-3">See <code>bsend/3</code>.</a></td></tr>
-<tr><td><a href="#bsend-3">bsend/3</a></td><td>Synchronous data transmission.</td></tr>
-<tr><td><a href="#close-1">close/1</a></td><td><a href="#close-2">See <code>close/2</code>.</a></td></tr>
-<tr><td><a href="#close-2">close/2</a></td><td>Close an open serial port.</td></tr>
-<tr><td><a href="#flush-1">flush/1</a></td><td><a href="#flush-2">See <code>flush/2</code>.</a></td></tr>
-<tr><td><a href="#flush-2">flush/2</a></td><td>Wait until buffered data has been transmitted to the endpoint.</td></tr>
-<tr><td><a href="#init-3">init/3</a></td><td><b>This is an internal function: do not use.</b>  Sets up a
- 		newly spawned interface process.</td></tr>
-<tr><td><a href="#loop-4">loop/4</a></td><td><b>This is an internal function: do not use.</b>  Main loop
- 		of an interface process.</td></tr>
-<tr><td><a href="#open-2">open/2</a></td><td>Open a serial port for communications.</td></tr>
-<tr><td><a href="#recv-2">recv/2</a></td><td><a href="#recv-3">See <code>recv/3</code>.</a></td></tr>
-<tr><td><a href="#recv-3">recv/3</a></td><td>Read data from an open serial port.</td></tr>
-<tr><td><a href="#send-2">send/2</a></td><td>Partially asynchronous data transmission.</td></tr>
-<tr><td><a href="#set_owner-1">set_owner/1</a></td><td><a href="#set_owner-2">See <code>set_owner/2</code>.</a></td></tr>
-<tr><td><a href="#set_owner-2">set_owner/2</a></td><td>Change the owner of the serial port to another process.</td></tr>
-<tr><td><a href="#setopts-2">setopts/2</a></td><td>Change the current options on the serial port.</td></tr>
-</table>
-
 <h2><a name="types">Data Types</a></h2>
 
-<h3><a name="type-device_name">device_name()</a> = string() | atom() | integer()</h3>
-
-
- 		<p>
- 		The name of a serial port on the host operating system.  On
- 		Windows machines this is frequently of the form "COMn" where
- 		n is some integer >= 1.  On UNIX systems this may be a
- 		tty device, for example "/dev/ttya".
- 		</p>
+<h3 class="typedecl"><a name="type-device_name">device_name()</a></h3>
+<p><tt>device_name() = string() | atom() | integer()</tt></p>
+<p>  <p>
+  The name of a serial port on the host operating system.  On
+  Windows machines this is frequently of the form "COMn" where
+  n is some integer &gt;= 1.  On UNIX systems this may be a
+  tty device, for example "/dev/ttya".
+  </p>
  
- 		<p>
- 		Either atoms or strings are allowed, making it easy to spec
- 		'com1' or "COM1".  On UNIX atoms will automatically
- 		have "/dev/" prefixed to them, forming a proper device path,
- 		however case does matter.  With the prefixing, 'tty0' becomes
- 		the full path "/dev/tty0".
- 		</p>
+  <p>
+  Either atoms or strings are allowed, making it easy to spec
+  'com1' or "COM1".  On UNIX atoms will automatically
+  have "/dev/" prefixed to them, forming a proper device path,
+  however case does matter.  With the prefixing, 'tty0' becomes
+  the full path "/dev/tty0".
+  </p>
  
- 		<p>
- 		If an integer is supplied, the ordinal is used with an
- 		OS specific prefix to locate the serial port.  This does not
- 		work on all platforms, and on some like Windows may not work
- 		for all serial ports as not all serial ports start with the
- 		"COM" prefix.
- 		</p>
+  <p>
+  If an integer is supplied, the ordinal is used with an
+  OS specific prefix to locate the serial port.  This does not
+  work on all platforms, and on some like Windows may not work
+  for all serial ports as not all serial ports start with the
+  "COM" prefix.
+  </p></p>
+
+<h3 class="typedecl"><a name="type-option">option()</a></h3>
+<p><tt>option() = atom() | {atom(), term()}</tt></p>
+<p>  <p>All items in an <code><a href="#type-option_list">option_list()</a></code> value must be single atoms
+  or name/value pair tuples.  (A standard Erlang property list.) The
+  type of Value and its range of values depends on the specific Name
+  atom paired with it.</p>
  
+  <p>See <a href="#-options">Available Options</a>.</p></p>
 
-<h3><a name="type-option_list">option_list()</a> = [<a href="#type-option">option()</a>]</h3>
-
-
- 		<p>
- 		A list of options to configure the serial port and how Erlang
- 		reads and writes data from it.  The option list allows setting
- 		baud rate, buffer size, packet formatting, and other options.
- 		</p>
+<h3 class="typedecl"><a name="type-option_list">option_list()</a></h3>
+<p><tt>option_list() = [<a href="#type-option">option()</a>]</tt></p>
+<p>  <p>
+  A list of options to configure the serial port and how Erlang
+  reads and writes data from it.  The option list allows setting
+  baud rate, buffer size, packet formatting, and other options.
+  </p>
  
- 		<p>See <a href="#-options">Available Options</a>.</p>
- 
+  <p>See <a href="#-options">Available Options</a>.</p></p>
 
-<h3><a name="type-option">option()</a> = Name | {Name, Value}<ul><li>Value = term()</li><li>Name = atom()</li></ul></h3>
+<h3 class="typedecl"><a name="type-port_ref">port_ref()</a></h3>
+<p><b>abstract datatype</b>: <tt>port_ref()</tt></p>
+<p>  <p>Opaque term returned by <a href="#open-2"><code>open/2</code></a> to allow callers to
+  interact with an open serial port. The internals of the term should
+  not be directly accessed or modified by the caller; and the caller
+  should not rely on the term format as it may change in the future
+  without notice.</p></p>
 
+<h3 class="typedecl"><a name="type-time_in_ms">time_in_ms()</a></h3>
+<p><tt>time_in_ms() = integer()</tt></p>
+<p>  <p>
+  A length of time, expressed as a number of milliseconds.  The
+  special atom <code>infinity</code> is not accepted as a valid
+  value for this type.
+  </p></p>
 
- 		<p>
- 		All items in an <a href="#type-option_list">option_list()</a>
- 		value must be single atoms or name/value pair tuples.  (A
- 		standard Erlang property list.)  The type of Value and its range
- 		of values depends on the specific Name atom paired with it.
- 		</p>
- 
- 		<p>See <a href="#-options">Available Options</a>.</p>
- 
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#asend-2">asend/2</a></td><td>Asynchronous data transmission.</td></tr>
+<tr><td valign="top"><a href="#bsend-2">bsend/2</a></td><td>Equivalent to <a href="#bsend-3"><tt>bsend(PortRef, Packet, infinity)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#bsend-3">bsend/3</a></td><td>Synchronous data transmission.</td></tr>
+<tr><td valign="top"><a href="#close-1">close/1</a></td><td>Equivalent to <a href="#close-2"><tt>close(PortRef, 3000)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#close-2">close/2</a></td><td>Close an open serial port.</td></tr>
+<tr><td valign="top"><a href="#flush-1">flush/1</a></td><td>Equivalent to <a href="#flush-2"><tt>flush(PortRef, infinity)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#flush-2">flush/2</a></td><td>Wait until buffered data has been transmitted to the endpoint.</td></tr>
+<tr><td valign="top"><a href="#open-2">open/2</a></td><td>Open a serial port for communications.</td></tr>
+<tr><td valign="top"><a href="#recv-2">recv/2</a></td><td>Equivalent to <a href="#recv-3"><tt>recv(PortRef, Length, infinity)</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#recv-3">recv/3</a></td><td>Read data from an open serial port.</td></tr>
+<tr><td valign="top"><a href="#send-2">send/2</a></td><td>Partially asynchronous data transmission.</td></tr>
+<tr><td valign="top"><a href="#set_owner-1">set_owner/1</a></td><td>Equivalent to <a href="#set_owner-2"><tt>set_owner(PortRef, self())</tt></a>.
+</td></tr>
+<tr><td valign="top"><a href="#set_owner-2">set_owner/2</a></td><td>Change the owner of the serial port to another process.</td></tr>
+<tr><td valign="top"><a href="#setopts-2">setopts/2</a></td><td>Change the current options on the serial port.</td></tr>
+</table>
 
-<h3><a name="type-port_ref">port_ref()</a> = term()</h3>
+<h2><a name="functions">Function Details</a></h2>
 
-
- 		<p>
- 		Opaque term returned by <a href="#open-2">open/2</a> to allow
- 		callers to interact with an open serial port.  The internals of
- 		the term should	not be directly accessed or modified by the
- 		caller; and the caller should not rely on the term format as
- 		it may change in the future without notice.
- 		</p>
- 
-
-<h3><a name="type-time_in_ms">time_in_ms()</a> = integer()</h3>
-
-
- 		<p>
- 		A length of time, expressed as a number of milliseconds.  The
- 		special atom <code>infinity</code> is not accepted as a valid
- 		value for this type.
- 		</p>
-
-<h2><a name="exported">Exported Functions</a></h2>
-
-<h3><a name="asend-2">asend/2</a></h3>
-
-<p><code>asend(PortRef, Packet) -> ok<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Packet = binary() | [binary()]</li></ul></code></p>
-<p>Asynchronous data transmission.
+<h3 class="function"><a name="asend-2">asend/2</a></h3>
+<div class="spec">
+<p><tt>asend(PortRef, Packet) -&gt; ok</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Packet = binary() | [binary()]</tt></li></ul></p>
+</div><p><p>Asynchronous data transmission.</p>
  
   <p>
   Sends data through the serial port.  The data is first sent to the
   interface process, which means the caller should never block when
   this method is called, even if flow control has broken down and
   all IO buffers are full (as the interface process' message queue
-  can grow to an infinite length).
+  is only limited by the memory ERTS can obtain from the OS).
   </p>
- 
   <p>
   When this call returns, the data may only be queued for delivery.
-  There is no assurances that the data was actually transmitted
-  out the serial port.  Use <a href="#flush-1">flush/1</a>,
-  <a href="#flush-2">flush/2</a> or <a href="#bsend-2">bsend/2</a>
-  to wait for the data to have actually been sent out the serial
-  port to the endpoint.
+  There are no guarantees that the data was actually transmitted
+  out the serial port.  Use <a href="#flush-1"><code>flush/1</code></a>, <a href="#flush-2"><code>flush/2</code></a> or
+  <a href="#bsend-2"><code>bsend/2</code></a> to wait for the data to have actually been sent out
+  the serial port to the endpoint.
   </p>
  </p>
-<p>See also: <a href="#bsend-3"><code>bsend/3</code></a>, <a href="#send-2"><code>send/2</code></a>.</p>
+<p><b>See also:</b> <a href="#bsend-2">bsend/2</a>, <a href="#bsend-3">bsend/3</a>, <a href="#send-2">send/2</a>.</p>
 
-<h3><a name="bsend-2">bsend/2</a></h3>
+<h3 class="function"><a name="bsend-2">bsend/2</a></h3>
+<div class="spec">
+<p><tt>bsend(PortRef, Packet) -&gt; ok | {error, Reason}</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Packet = binary() | [binary()]</tt></li><li><tt>Reason = term()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#bsend-3"><tt>bsend(PortRef, Packet, infinity)</tt></a>.</p>
 
-<p><code>bsend(PortRef, Packet) -> ok | {error, Reason}<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Packet = binary() | [binary()]</li><li>Reason = term()</li></ul></code></p>
-<p>Equivalent to <a href="#bsend-3"><code>bsend(PortRef, Packet, infinity)</code></a>.</p>
 
-<h3><a name="bsend-3">bsend/3</a></h3>
-
-<p><code>bsend(PortRef, Packet, Timeout) -> ok | {error, timeout} | {error, Reason}<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Packet = binary() | [binary()]</li><li>Timeout = infinity | <a href="#type-time_in_ms">time_in_ms()</a></li><li>Reason = term()</li></ul></code></p>
-<p>Synchronous data transmission.
+<h3 class="function"><a name="bsend-3">bsend/3</a></h3>
+<div class="spec">
+<p><tt>bsend(PortRef, Packet, Timeout) -&gt; ok | {error, timeout} | {error, Reason}</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Packet = binary() | [binary()]</tt></li><li><tt>Timeout = infinity | <a href="#type-time_in_ms">time_in_ms()</a></tt></li><li><tt>Reason = term()</tt></li></ul></p>
+</div><p><p>Synchronous data transmission.</p>
  
   <p>
-  Sends data through the serial port.  Unlike all other forms of
-  the send call, bsend/2 and bsend/3 wait until the endpoint has
-  received the data before returning to the caller.  This may take
-  some time, depending on the speed of the serial port and how much
-  data is already queued up in the output queues.
+  Sends data through the serial port.  Unlike all other forms of the
+  send call, <a href="#bsend-2"><code>bsend/2</code></a> and <a href="#bsend-3"><code>bsend/3</code></a> wait until the
+  endpoint has received the data before returning to the caller.
+  This may take some time, depending on the speed of the serial port
+  and how much data is already queued up in the output queues.
   </p>
- 
   <p>
-  Callers are encouraged to use this form rather than bsend/2, as
-  it allows specification of a timeout, in case flow control has
-  broken down and the data already buffered cannot be sent.
+  Callers are encouraged to use this form rather than <a href="#bsend-2"><code>bsend/2</code></a>, as it allows specification of a timeout that prevents
+  hanging in case flow control has broken down and the data already
+  buffered cannot be sent.
   </p>
- 
   <p>
-  This function is roughly equivalent to (but easier to use):
+  This function is equivalent to (but easier to use than):
   </p>
   <pre>
- 		case send(PortRef, Packet) of
- 		ok ->    flush(PortRef, Timeout);
- 		Other -> Other
- 		end
+ 	case send(PortRef, Packet) of
+ 	    ok -&gt; flush(PortRef, Timeout);
+ 	    Other -&gt; Other
+ 	end
   </pre>
  </p>
-<p>See also: <a href="#asend-2"><code>asend/2</code></a>, <a href="#bsend-3"><code>bsend/3</code></a>, <a href="#send-2"><code>send/2</code></a>.</p>
+<p><b>See also:</b> <a href="#asend-2">asend/2</a>, <a href="#bsend-2">bsend/2</a>, <a href="#send-2">send/2</a>.</p>
 
-<h3><a name="close-1">close/1</a></h3>
+<h3 class="function"><a name="close-1">close/1</a></h3>
+<div class="spec">
+<p><tt>close(PortRef) -&gt; ok | killed</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li></ul></p>
+</div><p>Equivalent to <a href="#close-2"><tt>close(PortRef, 3000)</tt></a>.</p>
 
-<p><code>close(PortRef) -> ok | killed<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li></ul></code></p>
-<p>Equivalent to <a href="#close-2"><code>close(PortRef, 3000)</code></a>.</p>
 
-<h3><a name="close-2">close/2</a></h3>
-
-<p><code>close(PortRef, Timeout) -> ok | killed<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Timeout = <a href="#type-time_in_ms">time_in_ms()</a></li></ul></code></p>
-<p>Close an open serial port.
+<h3 class="function"><a name="close-2">close/2</a></h3>
+<div class="spec">
+<p><tt>close(PortRef, Timeout) -&gt; ok | killed</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Timeout = <a href="#type-time_in_ms">time_in_ms()</a></tt></li></ul></p>
+</div><p><p>Close an open serial port.</p>
  
   <p>
-  This call is not really necessary, as the port will automatically
+  This call is not always necessary, as the port will automatically
   close when the port owner terminates.
   </p>
- 
   <p>
   A timeout can be supplied, as this call blocks until it receives
   confirmation from the serial port process that all pending output
   has been transferred to the endpoint, and the port has closed down
   gracefully.
   </p>
- 
   <p>
   If the port's output buffer is full (because the endpoint has stopped
   receiving data, or flow control has been broken), the close command
-  may not be able to be processed in a timely fashion.   In this case,
+  may not be able to be processed in a timely fashion. In this case,
   this function will wait for <code>Timeout</code> to expire, and then
   brutually kill the serial port.  Brutally killing the port will
   release all resources correctly, but data will be lost when the output
@@ -455,79 +465,58 @@ Generic serial port interface.
   brutal kill version of this function will not cause the port owner
   process to crash, as the exit reason used is <code>normal</code>.
   </p>
- 
   <p>
-  Special note: If the caller attempts to use the special atom
-  'infinity' as the Timeout value, it will be silently converted to
-  60 seconds to prevent locking up the caller indefinately.
-  </p>
- </p>
+  Special note: If the caller attempts to use the atom 'infinity' as
+  the Timeout value, it will be silently converted to 60 seconds to
+  prevent locking up the caller indefinitely.
+  </p></p>
 
-<h3><a name="flush-1">flush/1</a></h3>
+<h3 class="function"><a name="flush-1">flush/1</a></h3>
+<div class="spec">
+<p><tt>flush(PortRef) -&gt; ok | {error, Reason}</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Reason = term()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#flush-2"><tt>flush(PortRef, infinity)</tt></a>.</p>
 
-<p><code>flush(PortRef) -> ok | {error, Reason}<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Reason = term()</li></ul></code></p>
-<p>Equivalent to <a href="#flush-2"><code>flush(PortRef, infinity)</code></a>.</p>
 
-<h3><a name="flush-2">flush/2</a></h3>
-
-<p><code>flush(PortRef, Timeout) -> ok | {error, timeout} | {error, Reason}<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Timeout = infinity | <a href="#type-time_in_ms">time_in_ms()</a></li><li>Reason = term()</li></ul></code></p>
-<p>Wait until buffered data has been transmitted to the endpoint.
+<h3 class="function"><a name="flush-2">flush/2</a></h3>
+<div class="spec">
+<p><tt>flush(PortRef, Timeout) -&gt; ok | {error, timeout} | {error, Reason}</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Timeout = infinity | <a href="#type-time_in_ms">time_in_ms()</a></tt></li><li><tt>Reason = term()</tt></li></ul></p>
+</div><p><p>Wait until buffered data has been transmitted to the endpoint.</p>
  
   <p>
   Waits until the port's outgoing data buffers have been fully drained
   and transmitted to the endpoint.  If any error is detected during
   transmission (while waiting for the data to finish being sent), the
   error will both be returned by this function and sent to the port
-  owner as a message (unless the caller is the port owner, in which
-  case the error is returned and no message is sent).
-  </p>
- </p>
+  owner as a message unless the caller is the port owner, in which
+  case the error is returned and no message is sent.
+  </p></p>
 
-<h3><a name="init-3">init/3</a></h3>
-
-<p><code>init(Arg1, Arg2, Arg3) -> term()</code></p>
-<p><b>This is an internal function: do not use.</b>  Sets up a
- 		newly spawned interface process.
- 
-  <p>
-  Sets up a newly spawned process to act as the interface between the
-  Erlang port driver and the rest of the Erlang environment.  The
-  interface process owns the actual port object, and keeps track of
-  the externally running port process which performs the low level
-  operating system calls.
-  </p>
- </p>
-<p>See also: <a href="#loop-3"><code>loop/3</code></a>.</p>
-
-<h3><a name="loop-4">loop/4</a></h3>
-
-<p><code>loop(Arg1, Arg2, Arg3, Arg4) -> term()</code></p>
-<p><b>This is an internal function: do not use.</b>  Main loop
- 		of an interface process.</p>
-<p>See also: <a href="#init-3"><code>init/3</code></a>.</p>
-
-<h3><a name="open-2">open/2</a></h3>
-
-<p><code>open(Device, Options) -> {ok, PortRef} | {error, Reason}<ul><li>Device = <a href="#type-device_name">device_name()</a></li><li>Options = <a href="#type-option_list">option_list()</a></li><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Reason = term()</li></ul></code></p>
-<p>Open a serial port for communications.
- 
+<h3 class="function"><a name="open-2">open/2</a></h3>
+<div class="spec">
+<p><tt>open(Device, Options) -&gt; {ok, PortRef} | {error, Reason}</tt>
+<ul class="definitions"><li><tt>Device = <a href="#type-device_name">device_name()</a></tt></li><li><tt>Options = <a href="#type-option_list">option_list()</a></tt></li><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Reason = term()</tt></li></ul></p>
+</div><p>Open a serial port for communications.
   <p>
   When a serial port is opened, the caller is setup as the port
-  owner.  (See <a href="#set_owner-2">set_owner/1, set_owner/2</a>.)
+  owner.  (See <a href="#set_owner-1"><code>set_owner/1</code></a>, <a href="#set_owner-2"><code>set_owner/2</code></a>.)
   At open, the port is linked to the owner, ensuring that if the owner
   terminates, the port will be automatically closed as well.
-  </p>
- </p>
+  </p></p>
 
-<h3><a name="recv-2">recv/2</a></h3>
+<h3 class="function"><a name="recv-2">recv/2</a></h3>
+<div class="spec">
+<p><tt>recv(PortRef, Length) -&gt; {ok, Packet} | {error, Reason}</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Length = integer()</tt></li><li><tt>Packet = binary()</tt></li><li><tt>Reason = term()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#recv-3"><tt>recv(PortRef, Length, infinity)</tt></a>.</p>
 
-<p><code>recv(PortRef, Length) -> {ok, Packet} | {error, Reason}<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Length = integer()</li><li>Packet = binary()</li><li>Reason = term()</li></ul></code></p>
-<p>Equivalent to <a href="#recv-3"><code>recv(PortRef, Length, infinity)</code></a>.</p>
 
-<h3><a name="recv-3">recv/3</a></h3>
-
-<p><code>recv(PortRef, Length, Timeout) -> {ok, Packet} | {error, Reason}<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Length = integer()</li><li>Timeout = infinity | <a href="#type-time_in_ms">time_in_ms()</a></li><li>Packet = binary()</li><li>Reason = term()</li></ul></code></p>
-<p>Read data from an open serial port.
+<h3 class="function"><a name="recv-3">recv/3</a></h3>
+<div class="spec">
+<p><tt>recv(PortRef, Length, Timeout) -&gt; {ok, Packet} | {error, Reason}</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Length = integer()</tt></li><li><tt>Timeout = infinity | <a href="#type-time_in_ms">time_in_ms()</a></tt></li><li><tt>Packet = binary()</tt></li><li><tt>Reason = term()</tt></li></ul></p>
+</div><p><p>Read data from an open serial port.</p>
  
   <p>
   Reads exactly <code>Length</code> bytes from the serial port and
@@ -536,78 +525,83 @@ Generic serial port interface.
   buffers, this call will block until the timeout expires or the
   total number of bytes requested has been received.
   </p>
- 
   <p>
   If the caller doesn't want to block while waiting for data, the
   caller should either use a short timeout, or use an active mode
-  port instead of using <a href="#recv-2">recv/2</a> or
-  <a href="#recv-3">recv/3</a>.
+  port instead of using <a href="#recv-2"><code>recv/2</code></a> or <a href="#recv-3"><code>recv/3</code></a>.
   </p>
- </p>
+  <p>
+  <i>Note: currently only active mode is supported and thus
+  recv/2 and recv/3 are not implemented by the backend driver.
+  Do not use them!</i>
+  </p></p>
 
-<h3><a name="send-2">send/2</a></h3>
-
-<p><code>send(PortRef, Packet) -> ok<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Packet = binary() | [binary()]</li></ul></code></p>
-<p>Partially asynchronous data transmission.
+<h3 class="function"><a name="send-2">send/2</a></h3>
+<div class="spec">
+<p><tt>send(PortRef, Packet) -&gt; ok</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Packet = binary() | [binary()]</tt></li></ul></p>
+</div><p><p>Partially asynchronous data transmission.</p>
  
   <p>
   Sends data through the serial port.  The caller sends the data
-  out the port directly, which means the caller may block indefinately
+  out the port directly, which means the caller may block indefinitely
   if all IO buffers are full and flow control has broken down.  This
   is the fastest way to send data to the serial port, as it does not
   have to pass through the interface process first, but may be risky
   due to the flow control issues.
   </p>
- 
   <p>
   When this call returns, the data may only be queued for delivery.
-  There is no assurances that the data was actually transmitted
-  out the serial port.  Use <a href="#flush-1">flush/1</a>,
-  <a href="#flush-2">flush/2</a> or <a href="#bsend-2">bsend/2</a>
-  to wait for the data to have actually been sent out the serial
-  port to the endpoint.
+  There are no guarantees that the data was actually transmitted
+  out the serial port.  Use <a href="#flush-1"><code>flush/1</code></a>, <a href="#flush-2"><code>flush/2</code></a> or
+  <a href="#bsend-2"><code>bsend/2</code></a> to wait for the data to have actually been sent out
+  the serial port to the endpoint.
   </p>
- 
   <p>
-  If the caller wants true nonblocking sends, see
-  <a href="#asend-2">asend/2</a>.
+  If the caller wants true nonblocking sends, see <a href="#asend-2"><code>asend/2</code></a>.
   </p>
  </p>
-<p>See also: <a href="#asend-2"><code>asend/2</code></a>, <a href="#bsend-2"><code>bsend/2</code></a>, <a href="#bsend-3"><code>bsend/3</code></a>.</p>
+<p><b>See also:</b> <a href="#asend-2">asend/2</a>, <a href="#bsend-2">bsend/2</a>, <a href="#bsend-3">bsend/3</a>.</p>
 
-<h3><a name="set_owner-1">set_owner/1</a></h3>
+<h3 class="function"><a name="set_owner-1">set_owner/1</a></h3>
+<div class="spec">
+<p><tt>set_owner(PortRef) -&gt; ok | {error, Reason}</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Reason = term()</tt></li></ul></p>
+</div><p>Equivalent to <a href="#set_owner-2"><tt>set_owner(PortRef, self())</tt></a>.</p>
 
-<p><code>set_owner(PortRef) -> ok | {error, Reason}<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Reason = term()</li></ul></code></p>
-<p>Equivalent to <a href="#set_owner-2"><code>set_owner(PortRef, self())</code></a>.</p>
 
-<h3><a name="set_owner-2">set_owner/2</a></h3>
-
-<p><code>set_owner(PortRef, To) -> ok | {error, Reason}<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>To = pid()</li></ul></code></p>
-<p>Change the owner of the serial port to another process.
+<h3 class="function"><a name="set_owner-2">set_owner/2</a></h3>
+<div class="spec">
+<p><tt>set_owner(PortRef, To) -&gt; ok | {error, Reason}</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>To = pid()</tt></li><li><tt>Reason = term()</tt></li></ul></p>
+</div><p><p>Change the owner of the serial port to another process.</p>
  
   <p>
-  The owner of the serial port receives a set of messages, similiar
+  The owner of the serial port receives a set of messages, similar
   to the messages sent by the gen_tcp or ssl modules.  The messages
   are defined above in <a href="#-messages">Port Owner Messages</a>.
   </p>
- 
   <p>
   The port is always linked to the port owner process.  If the port
   owner exits, the serial port will automatically close, ensuring
   resources are freed up automatically.
   </p>
  </p>
-<p>See also: <a href="#set_owner-1"><code>set_owner/1</code></a>.</p>
+<p><b>See also:</b> <a href="#set_owner-1">set_owner/1</a>.</p>
 
-<h3><a name="setopts-2">setopts/2</a></h3>
-
-<p><code>setopts(PortRef, Opts) -> ok | {error, Reason}<ul><li>PortRef = <a href="#type-port_ref">port_ref()</a></li><li>Opts = [{active, When}]</li><li>When = false | true | once</li><li>Reason = term()</li></ul></code></p>
-<p>Change the current options on the serial port.
- 
+<h3 class="function"><a name="setopts-2">setopts/2</a></h3>
+<div class="spec">
+<p><tt>setopts(PortRef, Options) -&gt; ok | {error, Reason}</tt>
+<ul class="definitions"><li><tt>PortRef = <a href="#type-port_ref">port_ref()</a></tt></li><li><tt>Options = [{active, When}]</tt></li><li><tt>When = false | true | once</tt></li><li><tt>Reason = term()</tt></li></ul></p>
+</div><p>Change the current options on the serial port.
   <p>
-  Currently on the active flag can be changed.
+  <i>Currently only the active flag can be changed, but note that
+  only the setting {active, true} is supported at this time.</i>
   </p>
- 
-  <p>See <a href="#-options-active">{active, When}</a>.</p>
- </p></body>
+  <p>See <a href="#-options-active">{active, When}</a>.</p></p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Jul 2 2014, 18:21:40.</i></p>
+</body>
 </html>
