@@ -35,6 +35,7 @@ struct serial_channel *serial_open(char *port_name, int bufsz)
         chan->fd = open(port_name, O_RDWR | O_NOCTTY);
         if (chan->fd < 0) {
 		chan->lastError = errno;
+		DBG_LOG(fprintf(debug_log_file, "serial_open failed: %s\n", strerror(errno)));
 		free(chan);
 		return NULL;
 	}
@@ -389,6 +390,7 @@ static void main_loop(struct serial_port *port)
 int main(int argc, char **argv)
 {
 	struct pipe_channel *erts;
+	struct serial_channel *chan;
 	struct serial_port *port;
 	char *port_name;
 	int buffer_size;
@@ -446,7 +448,12 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	port = serial_port_create(serial_open(port_name, 2048), erts, buffer_size);
+	chan = serial_open(port_name, 2048);
+	if (!chan) {
+		return 1;
+	}
+	port = serial_port_create(chan, erts, buffer_size);
+
 	main_loop(port);
 
 	return 0;
