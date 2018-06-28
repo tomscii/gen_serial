@@ -81,6 +81,7 @@ int serial_configure(struct serial_channel *_chan, struct serial_cfg *cfg)
 	case 57600: tio.c_cflag |= B57600; break;
 	case 115200: tio.c_cflag |= B115200; break;
 	case 230400: tio.c_cflag |= B230400; break;
+#ifndef __APPLE__
 	case 460800: tio.c_cflag |= B460800; break;
 	case 500000: tio.c_cflag |= B500000; break;
 	case 576000: tio.c_cflag |= B576000; break;
@@ -93,6 +94,7 @@ int serial_configure(struct serial_channel *_chan, struct serial_cfg *cfg)
 	case 3000000: tio.c_cflag |= B3000000; break;
 	case 3500000: tio.c_cflag |= B3500000; break;
 	case 4000000: tio.c_cflag |= B4000000; break;
+#endif // !__APPLE__
 	default: chan->lastError = EINVAL; return -1;
 	}
 
