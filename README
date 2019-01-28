@@ -47,7 +47,7 @@ Building gen_serial on UNIX platforms is pretty simple:
 This will call erl -make with the Emakefile and then invoke the Makefile
 in c_src/posix to compile the POSIX driver backend.
 
-Alternatively, use rebar3 to compile as an OTP app:
+Alternatively, use rebar3 to compile as an OTP app on POSIX platforms:
 
 	rebar3 compile
 
