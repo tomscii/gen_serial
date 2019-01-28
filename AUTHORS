@@ -1,3 +1,8 @@
+Igor Clark <igor+gen_serial@igorclark.net>
+
+Added basic rebar support for the POSIX build in January 2019.
+
+
 Tom Szilagyi <tomszilagyi@gmail.com>:
 
 Released 0.2 in July 2014 with a backend driver added for POSIX (Linux
