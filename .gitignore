@@ -10,3 +10,4 @@ ebin/*.beam
 priv/bin/serial_esock
 src/*~
 *~
+_build/
