@@ -42,6 +42,45 @@ struct serial_channel *serial_open(char *port_name, int bufsz)
 	return (struct serial_channel *)chan;
 }
 
+speed_t serial_get_baud_const(int speed) {
+	switch (speed) {
+		case 50: return B50;
+		case 75: return B75;
+		case 110: return B110;
+		case 134: return B134;
+		case 150: return B150;
+		case 200: return B200;
+		case 300: return B300;
+		case 600: return B600;
+		case 1200: return B1200;
+		case 2400: return B2400;
+		case 4800: return B4800;
+		case 9600: return B9600;
+		case 19200: return B19200;
+		case 38400: return B38400;
+		case 57600: return B57600;
+		case 115200: return B115200;
+#ifndef __QNXNTO__
+		case 230400: return B230400;
+#ifndef __APPLE__
+		case 460800: return B460800;
+		case 500000: return B500000;
+		case 576000: return B576000;
+		case 921600: return B921600;
+		case 1000000: return B1000000;
+		case 1152000: return B1152000;
+		case 1500000: return B1500000;
+		case 2000000: return B2000000;
+		case 2500000: return B2500000;
+		case 3000000: return B3000000;
+		case 3500000: return B3500000;
+		case 4000000: return B4000000;
+#endif // !__APPLE__ 
+#endif // !__QNXNTO__
+		default: return B0;
+	}
+}
+
 int serial_configure(struct serial_channel *_chan, struct serial_cfg *cfg)
 {
 	struct serial_posix *chan = (struct serial_posix *)_chan;
@@ -63,40 +102,13 @@ int serial_configure(struct serial_channel *_chan, struct serial_cfg *cfg)
 
         tio.c_cflag = CLOCAL | CREAD;
 
-	switch (cfg->baud_rate) {
-	case 50: tio.c_cflag |= B50; break;
-	case 75: tio.c_cflag |= B75; break;
-	case 110: tio.c_cflag |= B110; break;
-	case 134: tio.c_cflag |= B134; break;
-	case 150: tio.c_cflag |= B150; break;
-	case 200: tio.c_cflag |= B200; break;
-	case 300: tio.c_cflag |= B300; break;
-	case 600: tio.c_cflag |= B600; break;
-	case 1200: tio.c_cflag |= B1200; break;
-	case 2400: tio.c_cflag |= B2400; break;
-	case 4800: tio.c_cflag |= B4800; break;
-	case 9600: tio.c_cflag |= B9600; break;
-	case 19200: tio.c_cflag |= B19200; break;
-	case 38400: tio.c_cflag |= B38400; break;
-	case 57600: tio.c_cflag |= B57600; break;
-	case 115200: tio.c_cflag |= B115200; break;
-	case 230400: tio.c_cflag |= B230400; break;
-#ifndef __APPLE__
-	case 460800: tio.c_cflag |= B460800; break;
-	case 500000: tio.c_cflag |= B500000; break;
-	case 576000: tio.c_cflag |= B576000; break;
-	case 921600: tio.c_cflag |= B921600; break;
-	case 1000000: tio.c_cflag |= B1000000; break;
-	case 1152000: tio.c_cflag |= B1152000; break;
-	case 1500000: tio.c_cflag |= B1500000; break;
-	case 2000000: tio.c_cflag |= B2000000; break;
-	case 2500000: tio.c_cflag |= B2500000; break;
-	case 3000000: tio.c_cflag |= B3000000; break;
-	case 3500000: tio.c_cflag |= B3500000; break;
-	case 4000000: tio.c_cflag |= B4000000; break;
-#endif // !__APPLE__
-	default: chan->lastError = EINVAL; return -1;
+	speed_t baud_value = serial_get_baud_const(cfg->baud_rate);
+	if (baud_value == B0) {
+		chan->lastError = EINVAL;
+		return -1;
 	}
+	cfsetispeed(&tio, baud_value);
+	cfsetospeed(&tio, baud_value);
 
 	switch (cfg->byte_size) {
 	case 5: tio.c_cflag |= CS5; break;
@@ -111,7 +123,12 @@ int serial_configure(struct serial_channel *_chan, struct serial_cfg *cfg)
 		tio.c_cc[VSTART] = 0x11; // XON / DC1;
 		tio.c_cc[VSTOP] = 0x13; // XOFF / DC3;
 	} else if (cfg->use_rts && cfg->use_cts) {
+		// not in POSIX, so differs between systems
+#ifdef __QNXNTO__
+		tio.c_cflag |= (IHFLOW | OHFLOW);
+#else
 		tio.c_cflag |= CRTSCTS;
+#endif
 	}
 
 	switch (cfg->parity) {
