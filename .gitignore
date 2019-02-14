@@ -10,3 +10,6 @@ ebin/*.beam
 priv/bin/serial_esock
 src/*~
 *~
+_build
+.rebar3
+rebar3.crashdump
