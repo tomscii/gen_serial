@@ -447,10 +447,10 @@ open(Device, Options) ->
       When :: false | true | once,
       Reason :: term().
 
-setopts(PortRef, Options=[{active, _}]) ->
+setopts(#gen_serial{port = Port}, Options=[{active, _}]) ->
 	Cfg = cfg(Options, cfg_defaults()),
 	Active = Cfg#serial_cfg.initially_active,
-	true = port_command(PortRef, <<?PACKET_ACTIVE:8, Active:8>>),
+	true = port_command(Port, <<?PACKET_ACTIVE:8, Active:8>>),
 	ok.
 
 
