@@ -489,7 +489,7 @@ extern void serial_port_destroy (struct serial_port* port);
 
 /* Handle the event which indicates we can read data from erts.
  */
-extern void serial_port_ertsr (struct serial_port* port);
+extern int serial_port_ertsr (struct serial_port* port);
 
 /* Handle the event which indicates we can write data to erts.
  */

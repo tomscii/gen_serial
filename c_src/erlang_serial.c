@@ -702,7 +702,7 @@ DBG_LOG(fprintf(debug_log_file,
 	}
 }
 
-void serial_port_ertsr (struct serial_port* port)
+int serial_port_ertsr (struct serial_port* port)
 {
 	int			r;
 
@@ -738,8 +738,8 @@ void serial_port_ertsr (struct serial_port* port)
 		DBG_LOG(fprintf(debug_log_file, "pipe_read error: %i %s\n",
 			ecode, msg));
 		port->isDead = 1;
-		return;
 	}
+	return r;
 }
 
 void serial_port_ertsw (struct serial_port* port)

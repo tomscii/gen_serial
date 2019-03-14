@@ -382,7 +382,12 @@ static void main_loop(struct serial_port *port)
 			}
 
 			if ((pollfds[i].fd == STDIN_FILENO) && (pollfds[i].revents & POLLIN)) {
-				serial_port_ertsr(port);
+				if (serial_port_ertsr(port) == 0) {
+					/* Just a safety net: read returned 0 bytes which means end of file
+					 * Erlang closed the port but flag POLLHUP had not been set for some reason
+					 */
+					port->isDead = 1;
+				}
 			} else if ((pollfds[i].fd == STDOUT_FILENO) && (pollfds[i].revents & POLLOUT)) {
 				serial_port_ertsw(port);
 			} else if (pollfds[i].fd == serial_fd) {
