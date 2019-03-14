@@ -514,7 +514,7 @@ close(PortRef) ->
 %% receiving data, or flow control has been broken), the close command
 %% may not be able to be processed in a timely fashion. In this case,
 %% this function will wait for <code>Timeout</code> to expire, and then
-%% brutually kill the serial port.  Brutally killing the port will
+%% brutally kill the serial port.  Brutally killing the port will
 %% release all resources correctly, but data will be lost when the output
 %% buffers are destroyed.  If the brutal kill is required, the atom
 %% <code>killed</code> is returned instead of <code>ok</code>.  The
@@ -539,9 +539,9 @@ close(PortRef, Timeout) ->
 	    ok;
 	{error, timeout} ->
 	    case PortRef of
-		_ when is_atom(PortRef) -> exit(whereis(PortRef), normal);
-		_ when is_pid(PortRef) -> exit(PortRef, normal);
-		#gen_serial{pid = Pid} -> exit(Pid, normal)
+		_ when is_atom(PortRef) -> exit(whereis(PortRef), kill);
+		_ when is_pid(PortRef) -> exit(PortRef, kill);
+		#gen_serial{pid = Pid} -> exit(Pid, kill)
 	    end,
 	    killed
     end.
