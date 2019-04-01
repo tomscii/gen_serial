@@ -724,21 +724,22 @@ void serial_port_ertsr (struct serial_port* port)
 	 * to try and write to the serial port if its not ready (at least
 	 * on the Windows implementations).
 	 */
-	if (r >= 0)
+	if (r > 0)
 	{
 		port->outgoingLen += r;
+		return;
+	}
 
-	} else if (pipe_last_error(port->erts))
+	port->isDead = 1; /* EOF or read error */
+	if (pipe_last_error(port->erts))
 	{
-		int		ecode;
+		int	ecode;
 		char	msg[256];
 
 		ecode = pipe_last_error(port->erts);
 		pipe_format_error(port->erts, ecode, msg, sizeof(msg));
 		DBG_LOG(fprintf(debug_log_file, "pipe_read error: %i %s\n",
 			ecode, msg));
-		port->isDead = 1;
-		return;
 	}
 }
 
