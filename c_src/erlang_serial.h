@@ -9,6 +9,14 @@
 #define ERROR_BAD_LENGTH   EBADMSG
 #endif
 
+#ifdef __QNXNTO__
+/* On QNX, POLLIN is defined as (POLLRDNORM | POLLRDBAND)
+ * but what we really want is just POLLRDNORM.
+ */
+#undef POLLIN
+#define POLLIN POLLRDNORM
+#endif /* __QNXNTO__ */
+
 #define SERIAL_PARITY_NONE	0
 #define SERIAL_PARITY_ODD	1
 #define SERIAL_PARITY_EVEN	2
